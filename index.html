@@ -1,304 +1,212 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
-    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sophia AI - AdadFinder</title>
+    <meta name="description" content="Assistant IA spécialisé dans la numérologie islamique, les valeurs Abjad et le Coran.">
+    <meta name="theme-color" content="#d4af37">
+    
+    <title data-i18n="title">Sophia AI - AdadFinder</title>
     
     <!-- Lien vers ton fichier CSS existant -->
     <link rel="stylesheet" href="styles.css">
     
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#d4af37">
+    <!-- Configuration PWA -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Assistant IA spécialisé dans la numérologie islamique et les valeurs Abjad">
-    <meta property="og:title" content="Sophia AI - AdadFinder">
-    <meta property="og:description" content="Calculateur de valeurs Abjad et assistant islamique">
-</head>
-    
-    <style>
-        :root {
-            --bg-primary: #f5f5dc;
-            --bg-secondary: #ffffff;
-            --text-primary: #2c3e50;
-            --accent-gold: #d4af37;
-            --accent-green: #2d5016;
-            --border-color: #e0e0e0;
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: #1a1a2e;
-            --bg-secondary: #16213e;
-            --text-primary: #eaeaea;
-            --accent-gold: #ffd700;
-            --accent-green: #4a7c59;
-            --border-color: #3a3a5a;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background 0.3s, color 0.3s;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .theme-toggle {
-            background: var(--accent-gold);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: transform 0.2s;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.05);
-        }
-
-        .chat-container {
-            background: var(--bg-secondary);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        .messages {
-            max-height: 500px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            min-height: 300px;
-        }
-
-        .message {
-            margin: 10px 0;
-            padding: 12px 16px;
-            border-radius: 10px;
-            animation: fadeIn 0.3s;
-            white-space: pre-wrap;
-            line-height: 1.6;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .user-message {
-            background: var(--accent-gold);
-            color: white;
-            margin-left: 20%;
-            text-align: right;
-        }
-
-        .ai-message {
-            background: var(--border-color);
-            margin-right: 20%;
-        }
-
-        .input-container {
-            display: flex;
-            gap: 10px;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            font-size: 16px;
-        }
-
-        button.send-btn {
-            background: var(--accent-green);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: transform 0.2s;
-        }
-
-        button.send-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .history-panel {
-            position: fixed;
-            right: -300px;
-            top: 0;
-            width: 300px;
-            height: 100vh;
-            background: var(--bg-secondary);
-            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
-            transition: right 0.3s;
-            padding: 20px;
-            overflow-y: auto;
-            z-index: 999;
-        }
-
-        .history-panel.open {
-            right: 0;
-        }
-
-        .history-item {
-            padding: 10px;
-            margin: 10px 0;
-            background: var(--bg-primary);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .history-item:hover {
-            transform: translateX(-5px);
-        }
-
-        .toggle-history {
-            position: fixed;
-            right: 20px;
-            top: 20px;
-            background: var(--accent-gold);
-            border: none;
-            padding: 10px 15px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 20px;
-            z-index: 1000;
-        }
-
-        .suggestions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .suggestion-btn {
-            background: var(--border-color);
-            border: 1px solid var(--accent-gold);
-            padding: 6px 12px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s;
-        }
-
-        .suggestion-btn:hover {
-            background: var(--accent-gold);
-            color: white;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .user-message {
-                margin-left: 10%;
-            }
-            
-            .ai-message {
-                margin-right: 10%;
-            }
-            
-            .history-panel {
-                width: 100%;
-                right: -100%;
-            }
-        }
-    </style>
 </head>
 <body>
-    <button class="toggle-history" onclick="toggleHistory()">📜</button>
+
+    <!-- Bouton flottant pour l'historique -->
+    <button class="toggle-history" onclick="toggleHistory()" title="Voir l'historique">📜</button>
     
     <div class="container">
+        <!-- En-tête avec Titre, Langue et Thème -->
         <div class="header">
             <h1>🌙 Sophia AI</h1>
-            <button class="theme-toggle" onclick="toggleTheme()">
-                <span id="theme-icon">🌙</span>
-            </button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <select id="lang-selector" onchange="changeLanguage(this.value)" class="lang-select">
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="ar">🇸🇦 العربية</option>
+                </select>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Changer de thème">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </div>
         </div>
 
+        <!-- Zone principale du Chat -->
         <div class="chat-container">
+            <!-- Suggestions de questions rapides -->
             <div class="suggestions" id="suggestions">
-                <button class="suggestion-btn" onclick="useSuggestion('2713 correspond quel verset ?')">2713 = quel verset ?</button>
-                <button class="suggestion-btn" onclick="useSuggestion('valeur de محمد')">valeur de محمد</button>
-                <button class="suggestion-btn" onclick="useSuggestion('99 noms d\'Allah')">99 noms d'Allah</button>
-                <button class="suggestion-btn" onclick="useSuggestion('sourate Fatiha')">Sourate Fatiha</button>
-                <button class="suggestion-btn" onclick="useSuggestion('aide')">Aide</button>
+                <!-- Rempli dynamiquement par JavaScript -->
             </div>
             
+            <!-- Zone d'affichage des messages -->
             <div class="messages" id="messages">
-                <div class="message ai-message">
-                    🌙 Bienvenue sur Sophia AI ! Je suis spécialisée dans la numérologie islamique et les valeurs Abjad.
-                    
-                    Vous pouvez me demander :
-                    • "2713 correspond quel verset ?"
-                    • "valeur de محمد"
-                    • "99 noms d'Allah"
-                    • "sourate Fatiha"
-                    
-                    Tapez "aide" pour voir tous les exemples !
+                <div class="message ai-message" id="welcome-message">
+                    <!-- Rempli dynamiquement par JavaScript -->
                 </div>
             </div>
             
+            <!-- Zone de saisie -->
             <div class="input-container">
-                <input type="text" id="userInput" placeholder="Posez votre question..." onkeypress="handleKeyPress(event)">
-                <button class="send-btn" onclick="sendMessage()">Envoyer</button>
+                <input type="text" id="userInput" data-i18n-placeholder="placeholder" placeholder="Posez votre question..." onkeypress="handleKeyPress(event)">
+                <button class="send-btn" data-i18n="send" onclick="sendMessage()">Envoyer</button>
             </div>
         </div>
         
-        <p style="text-align: center; margin-top: 20px;">
-            <a href="https://adadfinder.com" target="_blank" style="color: var(--accent-gold); text-decoration: none;">
-                🔗 Visiter adadfinder.com
+        <!-- Lien vers le site principal -->
+        <p style="text-align: center; margin-top: 20px; font-size: 14px;">
+            <a href="https://adadfinder.com" target="_blank" style="color: var(--accent-gold); text-decoration: none; font-weight: bold;">
+                🔗 Visiter le site principal : adadfinder.com
             </a>
         </p>
     </div>
 
+    <!-- Panneau latéral de l'historique -->
     <div class="history-panel" id="historyPanel">
-        <h2>Historique</h2>
-        <div id="historyList"></div>
-        <button onclick="clearHistory()" style="width: 100%; padding: 10px; margin-top: 20px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer;">
-            Effacer l'historique
+        <h2 data-i18n="history">Historique</h2>
+        <div id="historyList">
+            <!-- Les conversations seront listées ici -->
+        </div>
+        <button onclick="clearHistory()" class="btn-clear" data-i18n="clearHistory">
+            Effacer tout l'historique
         </button>
     </div>
 
-    <!-- Scripts -->
+    <!-- ========================================================= -->
+    <!-- CHARGEMENT DES FICHIERS EXTERNES (Dans l'ordre strict)    -->
+    <!-- ========================================================= -->
+    <script src="translations.js"></script>
     <script src="data.js"></script>
-    <script src="quran-api.js"></script>
     <script src="search-engine.js"></script>
-    
+
+    <!-- ========================================================= -->
+    <!-- LOGIQUE COMPLÈTE DE L'APPLICATION (Aucun raccourci)       -->
+    <!-- ========================================================= -->
     <script>
-        // ===== MODE SOMBRE/CLAIR =====
+        // ==========================================
+        // 1. GESTION DES LANGUES (I18N)
+        // ==========================================
+        const TRANSLATIONS = {
+            fr: {
+                title: "Sophia AI - AdadFinder",
+                placeholder: "Posez votre question sur les valeurs Abjad...",
+                send: "Envoyer",
+                history: "Historique des conversations",
+                clearHistory: "🗑️ Effacer tout l'historique",
+                welcome: "🌙 Bienvenue sur Sophia AI !\nJe suis spécialisée dans la numérologie islamique, les valeurs Abjad et le Coran.\n\nExemples de questions :\n• '2713 correspond à quel verset ?'\n• 'Quelle est la valeur de محمد ?'\n• 'Donne-moi les 99 noms d'Allah'",
+                suggestions: ["2713 = quel verset ?", "valeur de محمد", "99 noms d'Allah", "Sourate Al-Fatiha", "Aide"],
+                prefixes: {
+                    abjadResult: "📖 Résultats pour la valeur Abjad",
+                    verse: "🕌 **Verset Coranique**",
+                    nameOfAllah: "✨ **Nom d'Allah**",
+                    famousWord: "📝 **Mot célèbre**",
+                    theme: "🎯 Thème",
+                    translation: "💭 Traduction",
+                    value: "🔢 Valeur Abjad de",
+                    notFound: "❌ Je n'ai pas trouvé de correspondance pour cette valeur dans ma base de données.",
+                    help: "🌙 **Comment utiliser Sophia AI :**\n\n1️⃣ Tapez un **nombre** (ex: 786) pour trouver le verset correspondant.\n2️⃣ Tapez un **mot arabe** (ex: الله) pour calculer sa valeur Abjad.\n3️⃣ Tapez **'99 noms'** pour voir la liste des noms d'Allah.\n4️⃣ Tapez **'Sourate'** + un nom pour avoir des informations."
+                }
+            },
+            en: {
+                title: "Sophia AI - AdadFinder",
+                placeholder: "Ask your question about Abjad values...",
+                send: "Send",
+                history: "Conversation History",
+                clearHistory: "🗑️ Clear all history",
+                welcome: "🌙 Welcome to Sophia AI!\nI specialize in Islamic numerology, Abjad values, and the Quran.\n\nExample questions:\n• 'Which verse corresponds to 2713?'\n• 'What is the value of محمد?'\n• 'Give me the 99 Names of Allah'",
+                suggestions: ["2713 = which verse?", "value of محمد", "99 Names of Allah", "Surah Al-Fatiha", "Help"],
+                prefixes: {
+                    abjadResult: "📖 Results for Abjad value",
+                    verse: "🕌 **Quranic Verse**",
+                    nameOfAllah: "✨ **Name of Allah**",
+                    famousWord: "📝 **Famous Word**",
+                    theme: "🎯 Theme",
+                    translation: "💭 Translation",
+                    value: "🔢 Abjad value of",
+                    notFound: "❌ I did not find any correspondence for this value in my database.",
+                    help: "🌙 **How to use Sophia AI:**\n\n1️⃣ Type a **number** (e.g., 786) to find the corresponding verse.\n2️⃣ Type an **Arabic word** (e.g., الله) to calculate its Abjad value.\n3️⃣ Type **'99 names'** to see the Names of Allah.\n4️⃣ Type **'Surah'** + a name for information."
+                }
+            },
+            ar: {
+                title: "صوفيا أيه - عداد فايندر",
+                placeholder: "اطرح سؤالك حول القيم الأبجدية...",
+                send: "إرسال",
+                history: "سجل المحادثات",
+                clearHistory: "🗑️ مسح السجل بالكامل",
+                welcome: "🌙 مرحباً بك في صوفيا أيه!\nأنا متخصصة في الحساب الأبجدي الإسلامي وقيم الأبجد والقرآن الكريم.\n\nأمثلة على الأسئلة:\n• 'ما هي الآية المقابلة لـ 2713؟'\n• 'ما هي قيمة محمد؟'\n• 'أعطني أسماء الله الحسنى'",
+                suggestions: ["2713 = أي آية؟", "قيمة محمد", "أسماء الله الحسنى", "سورة الفاتحة", "مساعدة"],
+                prefixes: {
+                    abjadResult: "📖 نتائج القيمة الأبجدية",
+                    verse: "🕌 **آية قرآنية**",
+                    nameOfAllah: "✨ **اسم من أسماء الله**",
+                    famousWord: "📝 **كلمة مشهورة**",
+                    theme: "🎯 الموضوع",
+                    translation: "💭 الترجمة",
+                    value: "🔢 القيمة الأبجدية لـ",
+                    notFound: "❌ لم أجد أي تطابق لهذه القيمة في قاعدة البيانات الخاصة بي.",
+                    help: "🌙 **كيفية استخدام صوفيا أيه:**\n\n1️⃣ اكتب **رقماً** (مثال: 786) للعثور على الآية المقابلة.\n2️⃣ اكتب **كلمة عربية** (مثال: الله) لحساب قيمتها الأبجدية.\n3️⃣ اكتب **'أسماء الله'** لرؤية أسماء الله الحسنى.\n4️⃣ اكتب **'سورة'** + اسم للحصول على معلومات."
+                }
+            }
+        };
+
+        let currentLang = localStorage.getItem('sophia_lang') || 'fr';
+
+        function t(key) {
+            const keys = key.split('.');
+            let value = TRANSLATIONS[currentLang];
+            for (let k of keys) {
+                value = value ? value[k] : key;
+            }
+            return value || key;
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('sophia_lang', lang);
+            
+            // Gestion de la direction du texte (RTL pour l'arabe)
+            document.documentElement.lang = lang;
+            document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+            
+            // Mise à jour de tous les textes statiques
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                el.textContent = t(el.getAttribute('data-i18n'));
+            });
+            
+            // Mise à jour des placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+            });
+            
+            // Mise à jour du message de bienvenue et des suggestions
+            document.getElementById('welcome-message').textContent = t('welcome');
+            renderSuggestions();
+            document.getElementById('lang-selector').value = lang;
+        }
+
+        function renderSuggestions() {
+            const container = document.getElementById('suggestions');
+            container.innerHTML = '';
+            const suggestionsList = t('suggestions');
+            suggestionsList.forEach(text => {
+                const btn = document.createElement('button');
+                btn.className = 'suggestion-btn';
+                btn.textContent = text;
+                btn.onclick = () => {
+                    document.getElementById('userInput').value = text;
+                    sendMessage();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // ==========================================
+        // 2. GESTION DU THÈME (Sombre / Clair)
+        // ==========================================
         function toggleTheme() {
             const html = document.documentElement;
             const currentTheme = html.getAttribute('data-theme');
@@ -309,12 +217,9 @@
             document.getElementById('theme-icon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
         }
 
-        // Charger le thème sauvegardé
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        document.getElementById('theme-icon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-
-        // ===== HISTORIQUE DES CONVERSATIONS =====
+        // ==========================================
+        // 3. GESTION DE L'HISTORIQUE DES CONVERSATIONS
+        // ==========================================
         let conversations = JSON.parse(localStorage.getItem('conversations')) || [];
         let currentConversation = [];
 
@@ -330,10 +235,10 @@
                     id: Date.now(),
                     title: title,
                     messages: currentConversation,
-                    date: new Date().toLocaleDateString('fr-FR')
+                    date: new Date().toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : (currentLang === 'ar' ? 'ar-SA' : 'en-US'))
                 });
                 localStorage.setItem('conversations', JSON.stringify(conversations));
-                currentConversation = [];
+                currentConversation = []; // Réinitialiser pour la prochaine conversation
             }
         }
 
@@ -341,51 +246,53 @@
             const historyList = document.getElementById('historyList');
             historyList.innerHTML = '';
             
+            if (conversations.length === 0) {
+                historyList.innerHTML = '<p style="text-align:center; color: #888; margin-top:20px;">Aucun historique</p>';
+                return;
+            }
+
             conversations.slice().reverse().forEach(conv => {
                 const item = document.createElement('div');
                 item.className = 'history-item';
                 item.innerHTML = `
                     <strong>${conv.title}</strong>
-                    <br><small>${conv.date}</small>
+                    <br><small style="color: #888;">${conv.date}</small>
                 `;
-                item.onclick = () => loadConversation(conv);
+                item.onclick = () => {
+                    document.getElementById('messages').innerHTML = '';
+                    conv.messages.forEach(msg => displayMessage(msg.text, msg.type, false));
+                    toggleHistory(); // Fermer le panneau après sélection
+                };
                 historyList.appendChild(item);
             });
         }
 
-        function loadConversation(conv) {
-            document.getElementById('messages').innerHTML = '';
-            conv.messages.forEach(msg => {
-                displayMessage(msg.text, msg.type, false);
-            });
-            toggleHistory();
-        }
-
         function clearHistory() {
-            if (confirm('Êtes-vous sûr de vouloir effacer tout l\'historique ?')) {
+            const confirmMsg = currentLang === 'ar' ? 'هل أنت متأكد من مسح السجل؟' : 
+                               (currentLang === 'en' ? 'Are you sure you want to clear all history?' : 'Êtes-vous sûr de vouloir effacer tout l\'historique ?');
+            if (confirm(confirmMsg)) {
                 conversations = [];
                 localStorage.removeItem('conversations');
                 loadHistory();
             }
         }
 
-        // ===== CHAT =====
+        // ==========================================
+        // 4. GESTION DU CHAT ET DE L'IA
+        // ==========================================
         function displayMessage(text, type, save = true) {
             const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${type}-message`;
             messageDiv.textContent = text;
             messagesDiv.appendChild(messageDiv);
+            
+            // Scroll automatique vers le bas
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
             if (save) {
                 currentConversation.push({ text, type, time: Date.now() });
             }
-        }
-
-        function useSuggestion(text) {
-            document.getElementById('userInput').value = text;
-            sendMessage();
         }
 
         function sendMessage() {
@@ -394,19 +301,30 @@
             
             if (!text) return;
 
+            // Afficher le message de l'utilisateur
             displayMessage(text, 'user');
             input.value = '';
 
-            // Utiliser le moteur de recherche
+            // Simuler un petit délai de réflexion de l'IA
             setTimeout(() => {
-                const response = searchEngine.search(text);
-                displayMessage(response || getFallbackResponse(text), 'ai');
+                // 1. Essayer de trouver une réponse via le moteur de recherche Abjad
+                let response = null;
+                if (typeof searchEngine !== 'undefined') {
+                    response = searchEngine.search(text);
+                }
                 
-                // Sauvegarder après chaque échange
+                // 2. Si aucune réponse structurée, utiliser la réponse de secours
+                if (!response) {
+                    response = getFallbackResponse(text);
+                }
+                
+                displayMessage(response, 'ai');
+                
+                // Sauvegarder la conversation si elle contient au moins 2 messages (1 user + 1 IA)
                 if (currentConversation.length >= 2) {
                     saveConversation();
                 }
-            }, 300);
+            }, 400);
         }
 
         function handleKeyPress(event) {
@@ -416,37 +334,46 @@
         }
 
         function getFallbackResponse(text) {
-            text = text.toLowerCase();
+            const lowerText = text.toLowerCase();
             
-            if (text.includes("abjad")) {
-                return "La valeur Abjad est un système de numérotation des lettres arabes. Chaque lettre a une valeur numérique spécifique.\n\nTu peux me demander :\n• '2713 correspond quel verset ?'\n• 'valeur de محمد'\n• '99 noms d'Allah'";
+            // Détection des mots-clés d'aide dans les 3 langues
+            if (lowerText.includes("aide") || lowerText.includes("help") || lowerText.includes("مساعدة") || lowerText.includes("كيف")) {
+                return t('prefixes.help');
             }
             
-            if (text.includes("aide") || text.includes("help")) {
-                return "🌙 Comment utiliser Sophia AI :\n\n" +
-                       "📖 Recherches disponibles :\n" +
-                       "• Tape un nombre (ex: '2713') pour trouver le verset correspondant\n" +
-                       "• Tape un mot arabe (ex: 'محمد') pour calculer sa valeur Abjad\n" +
-                       "• Tape '99 noms' pour voir les noms d'Allah\n" +
-                       "• Tape 'sourate Fatiha' pour des infos sur une sourate\n\n" +
-                       "💡 Exemples :\n" +
-                       "• 'Que signifie 786 ?'\n" +
-                       "• 'valeur de الرحمن'\n" +
-                       "• 'montre-moi les noms d'Allah'";
-            }
+            // Réponse par défaut si l'IA ne comprend pas la requête
+            const defaultResponses = {
+                fr: "Je suis Sophia AI, spécialisée dans les valeurs Abjad et le Coran. Tapez 'Aide' pour voir ce que je peux faire.",
+                en: "I am Sophia AI, specialized in Abjad values and the Quran. Type 'Help' to see what I can do.",
+                ar: "أنا صوفيا أيه، متخصصة في القيم الأبجدية والقرآن. اكتب 'مساعدة' لمعرفة ما يمكنني فعله."
+            };
             
-            return "Je suis Sophia AI, spécialisée dans la numérologie islamique. Je peux vous aider avec :\n\n" +
-                   "🔢 Calcul de valeurs Abjad\n" +
-                   "📖 Correspondances avec les versets du Coran\n" +
-                   "✨ Les 99 Noms d'Allah\n" +
-                   "📚 Informations sur les sourates\n\n" +
-                   "Tapez 'aide' pour voir tous les exemples !";
+            return defaultResponses[currentLang] || defaultResponses['fr'];
         }
 
-        // ===== PWA =====
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js');
-        }
+        // ==========================================
+        // 5. INITIALISATION AU CHARGEMENT DE LA PAGE
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Charger le thème sauvegardé
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('theme-icon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            
+            // 2. Charger la langue sauvegardée
+            changeLanguage(currentLang);
+            
+            // 3. Enregistrer le Service Worker pour la PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker enregistré avec succès:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Échec de l\'enregistrement du Service Worker:', error);
+                    });
+            }
+        });
     </script>
 </body>
 </html>
