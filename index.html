@@ -3,197 +3,364 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdadFinder AI - Assistant Islamique Intelligent</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Sophia AI - AdadFinder</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#d4af37">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Assistant IA spécialisé dans la numérologie islamique et les valeurs Abjad">
+    <meta property="og:title" content="Sophia AI - AdadFinder">
+    <meta property="og:description" content="Calculateur de valeurs Abjad et assistant islamique">
+    <meta property="og:image" content="preview.jpg">
+    
+    <style>
+        :root {
+            --bg-primary: #f5f5dc;
+            --bg-secondary: #ffffff;
+            --text-primary: #2c3e50;
+            --accent-gold: #d4af37;
+            --accent-green: #2d5016;
+            --border-color: #e0e0e0;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --text-primary: #eaeaea;
+            --accent-gold: #ffd700;
+            --accent-green: #4a7c59;
+            --border-color: #3a3a5a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .theme-toggle {
+            background: var(--accent-gold);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        .chat-container {
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .messages {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 12px 16px;
+            border-radius: 10px;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: var(--accent-gold);
+            color: white;
+            margin-left: 20%;
+            text-align: right;
+        }
+
+        .ai-message {
+            background: var(--border-color);
+            margin-right: 20%;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        button.send-btn {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        button.send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .history-panel {
+            position: fixed;
+            right: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: var(--bg-secondary);
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            transition: right 0.3s;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .history-panel.open {
+            right: 0;
+        }
+
+        .history-item {
+            padding: 10px;
+            margin: 10px 0;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .history-item:hover {
+            transform: translateX(-5px);
+        }
+
+        .toggle-history {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            background: var(--accent-gold);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 1000;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .user-message {
+                margin-left: 10%;
+            }
+            
+            .ai-message {
+                margin-right: 10%;
+            }
+            
+            .history-panel {
+                width: 100%;
+                right: -100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="islamic-pattern"></div>
+    <button class="toggle-history" onclick="toggleHistory()">📜</button>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🌙 Sophia AI</h1>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="theme-icon">🌙</span>
+            </button>
+        </div>
 
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <span class="logo-icon">☽</span>
-                <span class="logo-text">AdadFinder</span>
-            </div>
-            <div class="nav-links">
-                <a href="https://adadfinder.com" target="_blank">Site Principal</a>
-                <button class="cta-button" onclick="scrollToChat()">Poser une Question</button>
+        <div class="chat-container">
+            <div class="messages" id="messages"></div>
+            
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="Posez votre question..." onkeypress="handleKeyPress(event)">
+                <button class="send-btn" onclick="sendMessage()">Envoyer</button>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-            <h1 class="hero-title">Assistant <span class="highlight">AdadFinder</span></h1>
-            <p class="hero-subtitle">Votre compagnon intelligent pour explorer les merveilles de la numérotation Abjad et du Saint Coran</p>
-            <div class="hero-buttons">
-                <button class="hero-button primary" onclick="scrollToChat()">
-                    <span>Commencer</span>
-                    <span class="arrow">→</span>
-                </button>
-                <a href="https://adadfinder.com" target="_blank" class="hero-button secondary">
-                    <span>Visiter le Site</span>
-                </a>
-            </div>
-        </div>
-        <div class="hero-image">
-            <div class="character-card">
-                <div class="character-avatar">
-                    <div class="avatar-placeholder">☪</div>
-                    <div class="online-badge">En ligne</div>
-                </div>
-                <div class="character-info">
-                    <h3>Assistant IA</h3>
-                    <p>Spécialisé Abjad & Coran</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <div class="history-panel" id="historyPanel">
+        <h2>Historique</h2>
+        <div id="historyList"></div>
+        <button onclick="clearHistory()" style="width: 100%; padding: 10px; margin-top: 20px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer;">
+            Effacer l'historique
+        </button>
+    </div>
 
-    <!-- About Section -->
-    <section class="about" id="about">
-        <div class="container">
-            <h2 class="section-title">Nos Services</h2>
-            <div class="about-grid">
-                <div class="about-card">
-                    <div class="card-icon">📖</div>
-                    <h3>Calcul Abjad</h3>
-                    <p>Calculez la valeur numérique de n'importe quel texte arabe selon les alphabets Oriental ou Maghrébin.</p>
-                </div>
-                <div class="about-card">
-                    <div class="card-icon">🕌</div>
-                    <h3>Recherche Coranique</h3>
-                    <p>Recherchez dans les 114 sourates du Saint Coran par valeur Abjad ou par texte.</p>
-                </div>
-                <div class="about-card">
-                    <div class="card-icon">⭐</div>
-                    <h3>99 Noms d'Allah</h3>
-                    <p>Explorez les 99 beaux noms d'Allah avec leurs valeurs Abjad correspondantes.</p>
-                </div>
-                <div class="about-card">
-                    <div class="card-icon">📊</div>
-                    <h3>Analyse Statistique</h3>
-                    <p>Analysez n'importe quel texte arabe : valeur totale, lettres, moyennes et plus.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <script>
+        // ===== MODE SOMBRE/CLAIR =====
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            document.getElementById('theme-icon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
 
-    <!-- Famous Values Section -->
-    <section class="famous-values">
-        <div class="container">
-            <h2 class="section-title">Valeurs Célèbres</h2>
-            <div class="values-grid">
-                <div class="value-card">
-                    <div class="value-arabic">بسم الله الرحمن الرحيم</div>
-                    <div class="value-number">786</div>
-                    <div class="value-name">Bismillah</div>
-                </div>
-                <div class="value-card">
-                    <div class="value-arabic">الله</div>
-                    <div class="value-number">66</div>
-                    <div class="value-name">Allah</div>
-                </div>
-                <div class="value-card">
-                    <div class="value-arabic">محمد</div>
-                    <div class="value-number">92</div>
-                    <div class="value-name">Muhammad ﷺ</div>
-                </div>
-                <div class="value-card">
-                    <div class="value-arabic">الرحمن</div>
-                    <div class="value-number">329</div>
-                    <div class="value-name">Ar-Rahman</div>
-                </div>
-                <div class="value-card">
-                    <div class="value-arabic">القرآن</div>
-                    <div class="value-number">382</div>
-                    <div class="value-name">Al-Quran</div>
-                </div>
-                <div class="value-card">
-                    <div class="value-arabic">الإسلام</div>
-                    <div class="value-number">163</div>
-                    <div class="value-name">Al-Islam</div>
-                </div>
-            </div>
-        </div>
-    </section>
+        // Charger le thème sauvegardé
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-icon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
-    <!-- Chat Section -->
-    <section class="chat-section" id="chat">
-        <div class="container">
-            <h2 class="section-title">Posez votre Question</h2>
-            <div class="chat-container-wrapper">
-                <div class="chat-container" id="chat-container">
-                    <div class="message bot">
-                        <div class="message-avatar">☪</div>
-                        <div class="message-content">
-                            <div class="message-text">
-                                As-salamu alaykum ! 🌙<br>
-                                Je suis l'assistant IA d'AdadFinder.<br>
-                                Comment puis-je vous aider aujourd'hui ?<br>
-                                <small>Je peux vous aider avec : Calcul Abjad, recherche coranique, 99 noms d'Allah, mots célèbres...</small>
-                            </div>
-                            <div class="message-time">Maintenant</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="suggestions">
-                    <button class="suggestion-btn" onclick="askSuggestion('Quelle est la valeur Abjad de Bismillah ?')">Valeur de Bismillah ?</button>
-                    <button class="suggestion-btn" onclick="askSuggestion('Quel nom d\'Allah a la valeur 66 ?')">Nom avec valeur 66 ?</button>
-                    <button class="suggestion-btn" onclick="askSuggestion('Combien y a-t-il de sourates dans le Coran ?')">Nombre de sourates ?</button>
-                    <button class="suggestion-btn" onclick="askSuggestion('Quelle est la valeur de محمد ?')">Valeur de محمد ?</button>
-                </div>
-                <div class="input-container">
-                    <input 
-                        type="text" 
-                        id="message-input" 
-                        placeholder="Posez votre question..."
-                        autocomplete="off"
-                    >
-                    <button id="send-btn">
-                        <span>Envoyer</span>
-                        <span class="send-icon">→</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
+        // ===== HISTORIQUE DES CONVERSATIONS =====
+        let conversations = JSON.parse(localStorage.getItem('conversations')) || [];
+        let currentConversation = [];
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>AdadFinder</h4>
-                    <p>Votre compagnon pour explorer les merveilles de la numérotation Abjad et du Saint Coran.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Services</h4>
-                    <ul>
-                        <li>Calcul Abjad</li>
-                        <li>Recherche Coranique</li>
-                        <li>99 Noms d'Allah</li>
-                        <li>Analyse Statistique</li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Liens</h4>
-                    <ul>
-                        <li><a href="https://adadfinder.com" target="_blank">Site Principal</a></li>
-                        <li><a href="#chat">Assistant IA</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 AdadFinder. Tous droits réservés.</p>
-            </div>
-        </div>
-    </footer>
+        function toggleHistory() {
+            document.getElementById('historyPanel').classList.toggle('open');
+            loadHistory();
+        }
 
-    <script src="app.js"></script>
+        function saveConversation() {
+            if (currentConversation.length > 0) {
+                const title = currentConversation[0].text.substring(0, 30) + '...';
+                conversations.push({
+                    id: Date.now(),
+                    title: title,
+                    messages: currentConversation,
+                    date: new Date().toLocaleDateString('fr-FR')
+                });
+                localStorage.setItem('conversations', JSON.stringify(conversations));
+                currentConversation = [];
+            }
+        }
+
+        function loadHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            
+            conversations.reverse().forEach(conv => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <strong>${conv.title}</strong>
+                    <br><small>${conv.date}</small>
+                `;
+                item.onclick = () => loadConversation(conv);
+                historyList.appendChild(item);
+            });
+        }
+
+        function loadConversation(conv) {
+            document.getElementById('messages').innerHTML = '';
+            conv.messages.forEach(msg => {
+                displayMessage(msg.text, msg.type, false);
+            });
+            toggleHistory();
+        }
+
+        function clearHistory() {
+            if (confirm('Êtes-vous sûr de vouloir effacer tout l\'historique ?')) {
+                conversations = [];
+                localStorage.removeItem('conversations');
+                loadHistory();
+            }
+        }
+
+        // ===== CHAT =====
+        function displayMessage(text, type, save = true) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            if (save) {
+                currentConversation.push({ text, type, time: Date.now() });
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            displayMessage(text, 'user');
+            input.value = '';
+
+            // Simuler une réponse IA (à remplacer par ton API)
+            setTimeout(() => {
+                const response = getAIResponse(text);
+                displayMessage(response, 'ai');
+                
+                // Sauvegarder après chaque échange
+                if (currentConversation.length >= 2) {
+                    saveConversation();
+                }
+            }, 500);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function getAIResponse(text) {
+            // Logique de réponse basique - à remplacer par ton système
+            if (text.toLowerCase().includes('abjad')) {
+                return "La valeur Abjad est un système de numérotation des lettres arabes...";
+            }
+            return "Je suis Sophia AI, spécialisée dans la numérologie islamique. Posez-moi une question sur les valeurs Abjad, les 99 noms d'Allah, ou les sourates !";
+        }
+
+        // ===== PWA =====
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
 </body>
 </html>
