@@ -1,221 +1,610 @@
-/* ===== VARIABLES DE THÈME (Clair / Sombre) ===== */
+/* =========================================================
+   1. VARIABLES CSS & THÈMES (Clair / Sombre)
+   ========================================================= */
 :root {
-    --bg-primary: #f5f5dc;
-    --bg-secondary: #ffffff;
-    --text-primary: #2c3e50;
-    --accent-gold: #d4af37;
-    --accent-green: #2d5016;
-    --border-color: #e0e0e0;
+    --bg-primary: #f5f5dc;        /* Beige clair */
+    --bg-secondary: #ffffff;      /* Blanc pur */
+    --text-primary: #2c3e50;      /* Gris foncé / Bleu nuit */
+    --text-secondary: #555555;    /* Gris moyen */
+    --accent-gold: #d4af37;       /* Or islamique */
+    --accent-gold-hover: #b5952f; /* Or plus foncé au survol */
+    --accent-green: #2d5016;      /* Vert islamique profond */
+    --accent-green-hover: #1e360e;/* Vert plus foncé au survol */
+    --border-color: #e0e0e0;      /* Bordure douce */
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.1);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-full: 50px;
+    --transition-speed: 0.3s;
 }
 
 [data-theme="dark"] {
-    --bg-primary: #1a1a2e;
-    --bg-secondary: #16213e;
-    --text-primary: #eaeaea;
-    --accent-gold: #ffd700;
-    --accent-green: #4a7c59;
-    --border-color: #3a3a5a;
+    --bg-primary: #1a1a2e;        /* Bleu nuit très foncé */
+    --bg-secondary: #16213e;      /* Bleu nuit foncé */
+    --text-primary: #eaeaea;      /* Blanc cassé */
+    --text-secondary: #b0b0b0;    /* Gris clair */
+    --accent-gold: #ffd700;       /* Or brillant */
+    --accent-gold-hover: #e6c200;
+    --accent-green: #4a7c59;      /* Vert plus clair pour le contraste */
+    --accent-green-hover: #3a6346;
+    --border-color: #3a3a5a;      /* Bordure sombre */
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.5);
 }
 
-/* ===== BASE ===== */
+/* =========================================================
+   2. RESET & BASE
+   ========================================================= */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--bg-primary);
+    background-color: var(--bg-primary);
     color: var(--text-primary);
-    transition: background 0.3s, color 0.3s;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
+/* Personnalisation de la barre de défilement (Scrollbar) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--accent-gold);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-gold-hover);
+}
+
+/* =========================================================
+   3. LAYOUT PRINCIPAL
+   ========================================================= */
 .container {
-    max-width: 800px;
+    max-width: 850px;
+    width: 100%;
     margin: 0 auto;
     padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
-/* ===== HEADER ===== */
+/* =========================================================
+   4. EN-TÊTE (HEADER)
+   ========================================================= */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
 }
 
-.theme-toggle {
-    background: var(--accent-gold);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: transform 0.2s;
+.header h1 {
+    font-size: 1.8rem;
+    color: var(--accent-gold);
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
-.theme-toggle:hover {
-    transform: scale(1.05);
-}
-
-/* ===== CHAT ===== */
-.chat-container {
-    background: var(--bg-secondary);
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-}
-
-.messages {
-    max-height: 500px;
-    overflow-y: auto;
-    margin-bottom: 20px;
-    min-height: 300px;
-}
-
-.message {
-    margin: 10px 0;
-    padding: 12px 16px;
-    border-radius: 10px;
-    animation: fadeIn 0.3s;
-    white-space: pre-wrap;
-    line-height: 1.6;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.user-message {
-    background: var(--accent-gold);
-    color: white;
-    margin-left: 20%;
-    text-align: right;
-}
-
-.ai-message {
-    background: var(--border-color);
-    margin-right: 20%;
-}
-
-/* ===== INPUTS & BOUTONS ===== */
-.input-container {
+.header-controls {
     display: flex;
-    gap: 10px;
+    gap: 12px;
+    align-items: center;
 }
 
-input[type="text"] {
-    flex: 1;
-    padding: 12px;
-    border: 2px solid var(--border-color);
-    border-radius: 10px;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-size: 16px;
-}
-
-button.send-btn {
-    background: var(--accent-green);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: transform 0.2s;
-}
-
-button.send-btn:hover {
-    transform: scale(1.05);
-}
-
-.suggestions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 15px;
-}
-
-.suggestion-btn {
-    background: var(--border-color);
-    border: 1px solid var(--accent-gold);
-    padding: 6px 12px;
-    border-radius: 15px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.2s;
-    color: var(--text-primary);
-}
-
-.suggestion-btn:hover {
+/* =========================================================
+   5. BOUTONS & CONTRÔLES
+   ========================================================= */
+.theme-toggle, .toggle-history {
     background: var(--accent-gold);
-    color: white;
-}
-
-/* ===== PANNEAU HISTORIQUE ===== */
-.history-panel {
-    position: fixed;
-    right: -300px;
-    top: 0;
-    width: 300px;
-    height: 100vh;
-    background: var(--bg-secondary);
-    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
-    transition: right 0.3s;
-    padding: 20px;
-    overflow-y: auto;
-    z-index: 999;
-}
-
-.history-panel.open {
-    right: 0;
-}
-
-.history-item {
-    padding: 10px;
-    margin: 10px 0;
-    background: var(--bg-primary);
-    border-radius: 8px;
+    color: #ffffff;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: var(--radius-full);
     cursor: pointer;
-    transition: transform 0.2s;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.history-item:hover {
-    transform: translateX(-5px);
+.theme-toggle:hover, .toggle-history:hover {
+    transform: scale(1.1);
+    background: var(--accent-gold-hover);
+    box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
 }
 
 .toggle-history {
     position: fixed;
     right: 20px;
     top: 20px;
-    background: var(--accent-gold);
-    border: none;
-    padding: 10px 15px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 20px;
     z-index: 1000;
 }
 
-/* ===== RESPONSIVE ===== */
+.lang-select {
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.lang-select:focus {
+    border-color: var(--accent-gold);
+}
+
+.btn-clear {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-clear:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   6. ZONE DE CHAT
+   ========================================================= */
+.chat-container {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 25px;
+    box-shadow: var(--shadow-medium);
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 500px;
+}
+
+/* Suggestions */
+.suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.suggestion-btn {
+    background: var(--bg-primary);
+    border: 1px solid var(--accent-gold);
+    color: var(--text-primary);
+    padding: 8px 16px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.suggestion-btn:hover {
+    background: var(--accent-gold);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(212, 175, 55, 0.2);
+}
+
+/* Zone des messages */
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    padding-right: 5px; /* Espace pour la scrollbar */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message {
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    max-width: 85%;
+    word-wrap: break-word;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(15px) scale(0.98); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
+}
+
+.user-message {
+    background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-hover));
+    color: #ffffff;
+    align-self: flex-end;
+    margin-left: 15%;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
+}
+
+.ai-message {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    align-self: flex-start;
+    margin-right: 15%;
+    border-bottom-left-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+/* Zone de saisie */
+.input-container {
+    display: flex;
+    gap: 12px;
+    margin-top: auto;
+}
+
+.input-container input[type="text"] {
+    flex: 1;
+    padding: 14px 18px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-full);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-container input[type="text"]:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+.input-container input[type="text"]::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+.send-btn {
+    background: var(--accent-green);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.send-btn:hover {
+    background: var(--accent-green-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+}
+
+.send-btn:active {
+    transform: translateY(0);
+}
+
+/* =========================================================
+   7. PANNEAU LATÉRAL (HISTORIQUE)
+   ========================================================= */
+.history-panel {
+    position: fixed;
+    right: -350px;
+    top: 0;
+    width: 320px;
+    height: 100vh;
+    background: var(--bg-secondary);
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+    transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    padding: 25px;
+    overflow-y: auto;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-panel.open {
+    right: 0;
+}
+
+.history-panel h2 {
+    font-size: 1.3rem;
+    color: var(--accent-gold);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.history-item {
+    padding: 15px;
+    margin-bottom: 12px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+}
+
+.history-item:hover {
+    transform: translateX(-5px);
+    border-left-color: var(--accent-gold);
+    box-shadow: var(--shadow-light);
+}
+
+.history-item strong {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
+
+.history-item small {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Overlay pour fermer l'historique en cliquant à côté (optionnel, géré par JS si besoin) */
+.history-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s;
+}
+
+.history-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* =========================================================
+   8. SUPPORT RTL (ARABE)
+   ========================================================= */
+[dir="rtl"] .toggle-history {
+    right: auto;
+    left: 20px;
+}
+
+[dir="rtl"] .history-panel {
+    right: auto;
+    left: -350px;
+    box-shadow: 5px 0 25px rgba(0, 0, 0, 0.15);
+    transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+[dir="rtl"] .history-panel.open {
+    left: 0;
+    right: auto;
+}
+
+[dir="rtl"] .history-item {
+    border-left: none;
+    border-right: 4px solid transparent;
+}
+
+[dir="rtl"] .history-item:hover {
+    transform: translateX(5px);
+    border-right-color: var(--accent-gold);
+}
+
+[dir="rtl"] .user-message {
+    margin-left: 0;
+    margin-right: 15%;
+    align-self: flex-start;
+    border-bottom-right-radius: var(--radius-md);
+    border-bottom-left-radius: 4px;
+}
+
+[dir="rtl"] .ai-message {
+    margin-right: 0;
+    margin-left: 15%;
+    align-self: flex-end;
+    border-bottom-left-radius: var(--radius-md);
+    border-bottom-right-radius: 4px;
+}
+
+[dir="rtl"] .input-container {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .messages {
+    padding-right: 0;
+    padding-left: 5px;
+}
+
+/* =========================================================
+   9. DESIGN RESPONSIVE (MOBILE & TABLETTE)
+   ========================================================= */
 @media (max-width: 768px) {
     .container {
-        padding: 10px;
+        padding: 15px;
     }
-    
-    .user-message {
-        margin-left: 10%;
+
+    .header h1 {
+        font-size: 1.4rem;
     }
-    
-    .ai-message {
-        margin-right: 10%;
+
+    .chat-container {
+        padding: 15px;
+        min-height: 400px;
     }
-    
-    .history-panel {
+
+    .message {
+        max-width: 90%;
+        font-size: 0.9rem;
+        padding: 12px 15px;
+    }
+
+    .user-message, .ai-message {
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+
+    [dir="rtl"] .user-message, [dir="rtl"] .ai-message {
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+
+    .input-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    [dir="rtl"] .input-container {
+        flex-direction: column;
+    }
+
+    .input-container input[type="text"] {
         width: 100%;
+    }
+
+    .send-btn {
+        width: 100%;
+        padding: 14px;
+    }
+
+    .history-panel {
+        width: 85%;
         right: -100%;
     }
+
+    .history-panel.open {
+        right: 0;
+    }
+
+    [dir="rtl"] .history-panel {
+        left: -100%;
+        width: 85%;
+    }
+
+    [dir="rtl"] .history-panel.open {
+        left: 0;
+    }
+
+    .toggle-history {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+        top: 15px;
+        right: 15px;
+    }
+
+    [dir="rtl"] .toggle-history {
+        left: 15px;
+        right: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .header-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .suggestions {
+        gap: 8px;
+    }
+
+    .suggestion-btn {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+}
+
+/* =========================================================
+   10. UTILITAIRES & ÉTATS SPÉCIAUX
+   ========================================================= */
+.hidden {
+    display: none !important;
+}
+
+.text-gold {
+    color: var(--accent-gold);
+}
+
+.text-green {
+    color: var(--accent-green);
+}
+
+/* Animation de chargement (typing) pour l'IA */
+.typing-indicator {
+    display: flex;
+    gap: 5px;
+    padding: 15px 18px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    align-self: flex-start;
+    margin-right: 15%;
+    border: 1px solid var(--border-color);
+}
+
+[dir="rtl"] .typing-indicator {
+    margin-right: 0;
+    margin-left: 15%;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: var(--accent-gold);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
 }
