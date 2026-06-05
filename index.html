@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sophia AI - Recherche Abjad</title>
+    <title>Sophia AI - AdadFinder</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -17,7 +17,7 @@
         .header { text-align: center; margin-bottom: 30px; }
         .header h1 { color: #d4af37; font-size: 2.5rem; margin-bottom: 10px; }
         
-        .search-box { 
+        .chat-container { 
             background: white; 
             border-radius: 20px; 
             padding: 25px; 
@@ -25,522 +25,366 @@
             margin-bottom: 20px; 
         }
         
-        .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        input[type="number"] { 
+        .messages { 
+            min-height: 400px; 
+            max-height: 500px; 
+            overflow-y: auto; 
+            margin-bottom: 20px; 
+            padding: 15px; 
+            background: #fafafa; 
+            border-radius: 15px; 
+        }
+        
+        .message { 
+            padding: 12px 18px; 
+            margin: 10px 0; 
+            border-radius: 12px; 
+            white-space: pre-wrap; 
+            line-height: 1.6; 
+            position: relative;
+        }
+        
+        .user-message { 
+            background: linear-gradient(135deg, #d4af37, #b5952f); 
+            color: white; 
+            margin-left: 20%; 
+            text-align: right; 
+        }
+        
+        .ai-message { 
+            background: #f0f0f0; 
+            margin-right: 20%; 
+            border-left: 4px solid #d4af37; 
+        }
+        
+        .input-container { display: flex; gap: 12px; }
+        input[type="text"] { 
             flex: 1; 
             padding: 14px 20px; 
             border: 2px solid #e0e0e0; 
             border-radius: 25px; 
             font-size: 16px; 
-            outline: none; 
         }
-        input[type="number"]:focus { border-color: #d4af37; }
         
-        .system-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
-        .toggle-btn { 
-            flex: 1; 
-            padding: 10px; 
-            border: 2px solid #d4af37; 
-            background: white; 
-            color: #2c3e50; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            transition: all 0.3s; 
-        }
-        .toggle-btn.active { background: #d4af37; color: white; }
-        
-        .search-btn { 
-            width: 100%; 
+        .send-btn { 
             background: linear-gradient(135deg, #2d5016, #1e360e); 
             color: white; 
             border: none; 
-            padding: 14px; 
+            padding: 14px 30px; 
             border-radius: 25px; 
             cursor: pointer; 
-            font-size: 16px; 
             font-weight: 600; 
         }
-        .search-btn:hover { transform: translateY(-2px); }
-        .search-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         
-        .results { 
+        .action-buttons { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: 10px; 
+            flex-wrap: wrap; 
+        }
+        
+        .action-btn { 
+            padding: 8px 16px; 
+            border: 2px solid #d4af37; 
             background: white; 
+            color: #2c3e50; 
             border-radius: 20px; 
-            padding: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            min-height: 400px; 
+            cursor: pointer; 
+            font-size: 0.85rem; 
+            transition: all 0.3s; 
         }
-        .results h2 { color: #d4af37; margin-bottom: 20px; }
         
-        .result-item { 
-            background: #fafafa; 
-            padding: 15px; 
-            margin: 10px 0; 
+        .action-btn:hover { 
+            background: #d4af37; 
+            color: white; 
+        }
+        
+        .calligraphy-img { 
+            max-width: 100%; 
             border-radius: 10px; 
-            border-left: 4px solid #d4af37; 
-        }
-        .result-item .arabic { 
-            font-size: 1.3rem; 
-            text-align: right; 
-            direction: rtl; 
-            margin: 10px 0; 
+            margin-top: 10px; 
+            border: 3px solid #d4af37; 
         }
         
-        .loading { text-align: center; padding: 40px; color: #666; }
-        .no-results { text-align: center; padding: 40px; color: #999; }
-        
-        .stats { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-            gap: 15px; 
-            margin-bottom: 20px; 
-        }
-        .stat-card { 
-            background: #f0f0f0; 
-            padding: 15px; 
+        .quiz-container { 
+            background: #fff3cd; 
+            padding: 20px; 
             border-radius: 10px; 
-            text-align: center; 
+            margin-top: 10px; 
         }
-        .stat-card .number { font-size: 2rem; color: #d4af37; font-weight: bold; }
+        
+        .quiz-option { 
+            display: block; 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border: 2px solid #d4af37; 
+            background: white; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            text-align: left; 
+            font-size: 1rem;
+        }
+        
+        .quiz-option:hover { 
+            background: #d4af37; 
+            color: white; 
+        }
+        
+        .quiz-option.correct { 
+            background: #27ae60 !important; 
+            color: white !important; 
+            border-color: #27ae60; 
+        }
+        
+        .quiz-option.wrong { 
+            background: #e74c3c !important; 
+            color: white !important; 
+            border-color: #e74c3c; 
+        }
+        
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .suggestion-btn {
+            background: white;
+            border: 2px solid #d4af37;
+            color: #2c3e50;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .suggestion-btn:hover {
+            background: #d4af37;
+            color: white;
+        }
     </style>
 </head>
-    <!-- Sophia Chat Widget pour AdadFinder.com -->
-<style>
-    /* Bouton flottant */
-    #sophia-chat-toggle {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, #2d5016, #1e360e);
-        border: 2px solid #d4af37;
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #d4af37;
-        font-size: 28px;
-        z-index: 9999;
-        transition: transform 0.2s;
-    }
-    #sophia-chat-toggle:hover {
-        transform: scale(1.1);
-    }
-
-    /* Fenêtre de chat */
-    #sophia-chat-box {
-        position: fixed;
-        bottom: 100px;
-        right: 30px;
-        width: 370px;
-        max-width: 90vw;
-        height: 520px;
-        max-height: 70vh;
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-        display: none;
-        flex-direction: column;
-        z-index: 9999;
-        overflow: hidden;
-        border: 2px solid #d4af37;
-    }
-
-    /* En-tête */
-    .sophia-header {
-        background: linear-gradient(135deg, #2d5016, #1e360e);
-        color: #d4af37;
-        padding: 15px 20px;
-        font-weight: bold;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        border-bottom: 1px solid #d4af37;
-    }
-    .sophia-header span { color: white; font-size: 0.85rem; margin-left: auto; cursor: pointer; }
-
-    /* Zone des messages */
-    .sophia-messages {
-        flex: 1;
-        overflow-y: auto;
-        padding: 15px;
-        background: #fafaf5;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-    .message {
-        max-width: 80%;
-        padding: 10px 15px;
-        border-radius: 18px;
-        line-height: 1.4;
-        font-size: 0.95rem;
-        word-wrap: break-word;
-    }
-    .message.user {
-        align-self: flex-end;
-        background: #e8f0dc;
-        color: #2c3e50;
-        border-bottom-right-radius: 4px;
-    }
-    .message.bot {
-        align-self: flex-start;
-        background: white;
-        border: 1px solid #e0e0c0;
-        color: #2c3e50;
-        border-bottom-left-radius: 4px;
-    }
-
-    /* Zone de saisie */
-    .sophia-input-area {
-        display: flex;
-        padding: 10px 15px;
-        background: white;
-        border-top: 1px solid #eee;
-        gap: 10px;
-    }
-    .sophia-input-area input {
-        flex: 1;
-        padding: 10px 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 25px;
-        outline: none;
-        font-size: 0.9rem;
-    }
-    .sophia-input-area input:focus { border-color: #d4af37; }
-    .sophia-input-area button {
-        background: #2d5016;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        cursor: pointer;
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background 0.2s;
-    }
-    .sophia-input-area button:hover { background: #1e360e; }
-    .sophia-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
-</style>
-
-<!-- Bouton flottant -->
-<div id="sophia-chat-toggle">💬</div>
-
-<!-- Fenêtre de chat -->
-<div id="sophia-chat-box">
-    <div class="sophia-header">
-        🌙 Sophia AI <span id="sophia-close">✕</span>
-    </div>
-    <div class="sophia-messages" id="sophia-messages">
-        <div class="message bot">
-            As-salamu alaykum ! Je suis Sophia, votre assistante pour les calculs Abjad, les 99 noms d'Allah et bien plus. Posez-moi votre question.
-        </div>
-    </div>
-    <div class="sophia-input-area">
-        <input type="text" id="sophia-input" placeholder="Tapez votre message..." autocomplete="off">
-        <button id="sophia-send">➤</button>
-    </div>
-</div>
-
-<script>
-    (function() {
-        // Configuration
-        const API_URL = 'http://localhost:8000/chat';   // ← À changer après déploiement
-
-        // Récupération / création de l'ID de session unique par visiteur
-        let sessionId = localStorage.getItem('sophia_session_id');
-        if (!sessionId) {
-            sessionId = 'web-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('sophia_session_id', sessionId);
-        }
-
-        // Éléments DOM
-        const toggleBtn = document.getElementById('sophia-chat-toggle');
-        const chatBox = document.getElementById('sophia-chat-box');
-        const closeBtn = document.getElementById('sophia-close');
-        const messagesDiv = document.getElementById('sophia-messages');
-        const inputEl = document.getElementById('sophia-input');
-        const sendBtn = document.getElementById('sophia-send');
-
-        // Afficher / masquer la fenêtre
-        toggleBtn.addEventListener('click', () => {
-            chatBox.style.display = 'flex';
-            toggleBtn.style.display = 'none';
-        });
-        closeBtn.addEventListener('click', () => {
-            chatBox.style.display = 'none';
-            toggleBtn.style.display = 'flex';
-        });
-
-        // Fonction pour ajouter un message dans la zone
-        function addMessage(text, sender) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender}`;
-            msgDiv.textContent = text;
-            messagesDiv.appendChild(msgDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        // Fonction d'envoi à l'API
-        async function sendMessage() {
-            const userMsg = inputEl.value.trim();
-            if (!userMsg) return;
-
-            // Désactiver l'envoi pendant la requête
-            sendBtn.disabled = true;
-            inputEl.disabled = true;
-
-            // Afficher le message de l'utilisateur
-            addMessage(userMsg, 'user');
-            inputEl.value = '';
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: userMsg, session_id: sessionId })
-                });
-                const data = await response.json();
-
-                if (data.reply) {
-                    addMessage(data.reply, 'bot');
-                } else if (data.error) {
-                    addMessage('Désolé, une erreur est survenue : ' + data.error, 'bot');
-                }
-            } catch (err) {
-                addMessage('Impossible de contacter Sophia. Vérifiez votre connexion.', 'bot');
-                console.error(err);
-            } finally {
-                sendBtn.disabled = false;
-                inputEl.disabled = false;
-                inputEl.focus();
-            }
-        }
-
-        // Événements
-        sendBtn.addEventListener('click', sendMessage);
-        inputEl.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-    })();
-</script>
 <body>
     <div class="container">
         <div class="header">
             <h1>🌙 Sophia AI</h1>
-            <p>Recherche Abjad dans le Coran</p>
+            <p>Assistant IA avec Audio, Calligraphie, Analyse et Quiz</p>
         </div>
 
-        <div class="search-box">
-            <div class="input-group">
-                <input type="number" id="searchValue" placeholder="Entrez une valeur (ex: 2713)" min="1">
+        <div class="chat-container">
+            <div class="suggestions">
+                <button class="suggestion-btn" onclick="useSuggestion('Calcule la valeur de محمد')">Valeur de محمد</button>
+                <button class="suggestion-btn" onclick="useSuggestion('Quel verset a la valeur 2713 ?')">Verset 2713</button>
+                <button class="suggestion-btn" onclick="useSuggestion('Donne-moi les 99 noms d\'Allah')">99 noms</button>
+                <button class="suggestion-btn" onclick="startQuiz()">🧠 Quiz</button>
             </div>
             
-            <div class="system-toggle">
-                <button class="toggle-btn active" onclick="setSystem('mashriqi')" id="btn-mashriqi">📖 Oriental</button>
-                <button class="toggle-btn" onclick="setSystem('maghribi')" id="btn-maghribi">🕌 Maghrébin</button>
+            <div class="messages" id="messages">
+                <div class="message ai-message">
+                    🌙 As-salamu alaykum ! Je suis Sophia AI.
+                    
+                    Fonctionnalités :
+                    🔊 Audio : Écoutez la prononciation
+                    🎨 Calligraphie : Générez des images stylisées
+                    📊 Analyse : Décomposition lettre par lettre
+                    🧠 Quiz : Testez vos connaissances
+                    
+                    Posez votre question !
+                </div>
             </div>
             
-            <button class="search-btn" onclick="searchByValue()" id="searchBtn">🔍 Rechercher</button>
-        </div>
-
-        <div class="results" id="results">
-            <h2>Résultats</h2>
-            <p style="text-align: center; color: #999; padding: 40px;">
-                Entrez une valeur et cliquez sur "Rechercher"
-            </p>
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="Posez votre question..." onkeypress="if(event.key==='Enter')sendMessage()">
+                <button class="send-btn" onclick="sendMessage()">Envoyer</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // VALEURS ABJAD
-        const ABJAD_VALUES = {
-            mashriqi: {
-                'ا': 1, 'ب': 2, 'ج': 3, 'د': 4, 'ه': 5, 'و': 6, 'ز': 7, 'ح': 8, 'ط': 9,
-                'ي': 10, 'ك': 20, 'ل': 30, 'م': 40, 'ن': 50, 'س': 60, 'ع': 70, 'ف': 80, 'ص': 90,
-                'ق': 100, 'ر': 200, 'ش': 300, 'ت': 400, 'ث': 500, 'خ': 600, 'ذ': 700, 'ض': 800, 'ظ': 900, 'غ': 1000
-            },
-            maghribi: {
-                'ا': 1, 'ب': 2, 'ج': 3, 'د': 4, 'ه': 5, 'و': 6, 'ز': 7, 'ح': 8, 'ط': 9,
-                'ي': 10, 'ك': 20, 'ل': 30, 'م': 40, 'ن': 50, 'ص': 60, 'ع': 70, 'ف': 80, 'ض': 90,
-                'ق': 100, 'ر': 200, 'س': 300, 'ت': 400, 'ث': 500, 'خ': 600, 'ذ': 700, 'ظ': 800, 'غ': 900, 'ش': 1000
-            }
-        };
+        const API_URL = 'http://localhost:8000';
+        const SESSION_ID = 'session_' + Date.now();
 
-        let currentSystem = 'mashriqi';
-        let quranData = null;
-
-        function calculateAbjad(text) {
-            let total = 0;
-            for (let char of text) {
-                if (ABJAD_VALUES[currentSystem][char]) {
-                    total += ABJAD_VALUES[currentSystem][char];
-                }
-            }
-            return total;
+        function addMessage(text, type) {
+            const messagesDiv = document.getElementById('messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${type}-message`;
+            msgDiv.textContent = text;
+            messagesDiv.appendChild(msgDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            return msgDiv;
         }
 
-        function setSystem(system) {
-            currentSystem = system;
-            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-${system}`).classList.add('active');
+        function addActionButtons(text, msgDiv) {
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'action-buttons';
+            
+            // Bouton Audio
+            const audioBtn = document.createElement('button');
+            audioBtn.className = 'action-btn';
+            audioBtn.textContent = '🔊 Écouter';
+            audioBtn.onclick = () => playAudio(text);
+            buttonsDiv.appendChild(audioBtn);
+            
+            // Bouton Calligraphie
+            const calliBtn = document.createElement('button');
+            calliBtn.className = 'action-btn';
+            calliBtn.textContent = '🎨 Calligraphie';
+            calliBtn.onclick = () => generateCalligraphy(text, msgDiv);
+            buttonsDiv.appendChild(calliBtn);
+            
+            // Bouton Analyse
+            const analyzeBtn = document.createElement('button');
+            analyzeBtn.className = 'action-btn';
+            analyzeBtn.textContent = '📊 Analyser';
+            analyzeBtn.onclick = () => analyzeText(text, msgDiv);
+            buttonsDiv.appendChild(analyzeBtn);
+            
+            msgDiv.appendChild(buttonsDiv);
         }
 
-        async function loadQuranData() {
-            if (quranData) return quranData;
+        async function playAudio(text) {
             try {
-                const response = await fetch('https://api.alquran.cloud/v1/quran/quran-uthmani');
+                const audio = new Audio(`${API_URL}/audio/play/${encodeURIComponent(text)}`);
+                audio.play();
+            } catch (error) {
+                addMessage('❌ Erreur audio: ' + error.message, 'ai');
+            }
+        }
+
+        async function generateCalligraphy(text, msgDiv) {
+            try {
+                const response = await fetch(`${API_URL}/calligraphy/${encodeURIComponent(text)}`);
                 const data = await response.json();
-                if (data.code === 200) {
-                    quranData = data.data.surahs;
-                    return quranData;
+                
+                if (data.image) {
+                    const img = document.createElement('img');
+                    img.className = 'calligraphy-img';
+                    img.src = `data:image/png;base64,${data.image}`;
+                    msgDiv.appendChild(img);
+                    
+                    const downloadBtn = document.createElement('a');
+                    downloadBtn.href = `${API_URL}/calligraphy/download/${encodeURIComponent(text)}`;
+                    downloadBtn.download = `calligraphy_${text}.png`;
+                    downloadBtn.className = 'action-btn';
+                    downloadBtn.textContent = '💾 Télécharger';
+                    downloadBtn.style.marginTop = '10px';
+                    downloadBtn.style.display = 'inline-block';
+                    msgDiv.appendChild(downloadBtn);
                 }
             } catch (error) {
-                console.error('Erreur API:', error);
-                throw error;
+                addMessage('❌ Erreur calligraphie: ' + error.message, 'ai');
             }
         }
 
-        async function searchByValue() {
-            const value = parseInt(document.getElementById('searchValue').value);
-            if (!value || value < 1) {
-                alert('Veuillez entrer une valeur valide');
-                return;
+        async function analyzeText(text, msgDiv) {
+            try {
+                const response = await fetch(`${API_URL}/analyze/${encodeURIComponent(text)}`);
+                const data = await response.json();
+                
+                let result = `📊 Analyse de "${text}" :\n\n`;
+                result += `Oriental: ${data.oriental.total} (${data.oriental.letters} lettres)\n`;
+                result += `Maghrébin: ${data.maghribi.total} (${data.maghribi.letters} lettres)\n\n`;
+                
+                result += `Décomposition :\n`;
+                data.breakdown.forEach(item => {
+                    result += `${item.letter} = ${item.oriental_value} (Oriental) / ${item.maghribi_value} (Maghrébin)\n`;
+                });
+                
+                addMessage(result, 'ai');
+            } catch (error) {
+                addMessage('❌ Erreur analyse: ' + error.message, 'ai');
             }
+        }
 
-            const resultsDiv = document.getElementById('results');
-            const searchBtn = document.getElementById('searchBtn');
-            
-            searchBtn.disabled = true;
-            resultsDiv.innerHTML = '<div class="loading">Chargement et calcul en cours...</div>';
+        async function startQuiz() {
+            try {
+                const response = await fetch(`${API_URL}/quiz`);
+                const data = await response.json();
+                
+                const quizDiv = document.createElement('div');
+                quizDiv.className = 'message ai-message';
+                quizDiv.innerHTML = `
+                    <div class="quiz-container">
+                        <h3>🧠 Quiz</h3>
+                        <p><strong>${data.question}</strong></p>
+                        <div id="quiz-options"></div>
+                    </div>
+                `;
+                
+                document.getElementById('messages').appendChild(quizDiv);
+                
+                const optionsDiv = quizDiv.querySelector('#quiz-options');
+                data.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.className = 'quiz-option';
+                    btn.textContent = option;
+                    btn.onclick = async () => {
+                        const checkResponse = await fetch(`${API_URL}/quiz/check`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                answer: option,
+                                correct_answer: data.correct_answer
+                            })
+                        });
+                        const result = await checkResponse.json();
+                        
+                        // Désactiver tous les boutons
+                        optionsDiv.querySelectorAll('.quiz-option').forEach(b => {
+                            b.disabled = true;
+                            if (b.textContent == data.correct_answer) {
+                                b.classList.add('correct');
+                            }
+                        });
+                        
+                        if (!result.correct) {
+                            btn.classList.add('wrong');
+                        }
+                        
+                        addMessage(result.message, 'ai');
+                    };
+                    optionsDiv.appendChild(btn);
+                });
+                
+                document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+            } catch (error) {
+                addMessage('❌ Erreur quiz: ' + error.message, 'ai');
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const msgDiv = addMessage(text, 'user');
+            addActionButtons(text, msgDiv);
+            input.value = '';
 
             try {
-                const surahs = await loadQuranData();
-                const results = { surahs: [], verses: [], words: [] };
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        session_id: SESSION_ID
+                    })
+                });
 
-                // Chercher dans les sourates
-                for (let surah of surahs) {
-                    const nameValue = calculateAbjad(surah.name);
-                    if (nameValue === value) {
-                        results.surahs.push({
-                            type: 'name',
-                            number: surah.number,
-                            name: surah.name,
-                            englishName: surah.englishName,
-                            value: nameValue
-                        });
-                    }
-                    if (surah.number === value) {
-                        results.surahs.push({
-                            type: 'number',
-                            number: surah.number,
-                            name: surah.name,
-                            englishName: surah.englishName,
-                            value: surah.number
-                        });
-                    }
+                const data = await response.json();
+                if (data.reply) {
+                    addMessage(data.reply, 'ai');
                 }
-
-                // Chercher dans les versets
-                for (let surah of surahs) {
-                    for (let ayah of surah.ayahs) {
-                        const ayahValue = calculateAbjad(ayah.text);
-                        if (ayahValue === value) {
-                            results.verses.push({
-                                surah: surah.englishName,
-                                surahArabic: surah.name,
-                                number: ayah.numberInSurah,
-                                text: ayah.text,
-                                value: ayahValue
-                            });
-                        }
-                    }
-                }
-
-                // Chercher dans les mots (limité)
-                let wordCount = 0;
-                for (let surah of surahs.slice(0, 10)) {
-                    if (wordCount >= 100) break;
-                    for (let ayah of surah.ayahs.slice(0, 5)) {
-                        const words = ayah.text.split(' ');
-                        for (let word of words) {
-                            if (wordCount >= 100) break;
-                            const wordValue = calculateAbjad(word);
-                            if (wordValue === value) {
-                                results.words.push({
-                                    word: word,
-                                    surah: surah.englishName,
-                                    ayah: ayah.numberInSurah,
-                                    value: wordValue
-                                });
-                                wordCount++;
-                            }
-                        }
-                    }
-                }
-
-                displayResults(value, results);
             } catch (error) {
-                resultsDiv.innerHTML = '<div class="no-results">❌ Erreur de chargement. Vérifiez votre connexion.</div>';
-            } finally {
-                searchBtn.disabled = false;
+                addMessage('❌ Erreur: ' + error.message, 'ai');
             }
         }
 
-        function displayResults(value, results) {
-            const resultsDiv = document.getElementById('results');
-            let html = `<h2>Résultats pour ${value} (${currentSystem === 'mashriqi' ? 'Oriental' : 'Maghrébin'})</h2>`;
-            
-            html += `<div class="stats">
-                <div class="stat-card"><div class="number">${results.surahs.length}</div><div class="label">Sourates</div></div>
-                <div class="stat-card"><div class="number">${results.verses.length}</div><div class="label">Versets</div></div>
-                <div class="stat-card"><div class="number">${results.words.length}</div><div class="label">Mots</div></div>
-            </div>`;
-
-            if (results.surahs.length > 0) {
-                html += '<h3>📖 Sourates</h3>';
-                results.surahs.forEach(s => {
-                    html += `<div class="result-item">
-                        <strong>Sourate ${s.number}: ${s.englishName}</strong>
-                        <div class="arabic">${s.name}</div>
-                        <div>Type: ${s.type === 'name' ? 'Nom' : 'Numéro'} | Valeur: ${s.value}</div>
-                    </div>`;
-                });
-            }
-
-            if (results.verses.length > 0) {
-                html += '<h3>🕌 Versets</h3>';
-                results.verses.forEach(v => {
-                    html += `<div class="result-item">
-                        <strong>${v.surah} - Verset ${v.number}</strong>
-                        <div class="arabic">${v.text}</div>
-                        <div>Valeur: ${v.value}</div>
-                    </div>`;
-                });
-            }
-
-            if (results.words.length > 0) {
-                html += '<h3>📝 Mots</h3>';
-                results.words.forEach(w => {
-                    html += `<div class="result-item">
-                        <div class="arabic">${w.word}</div>
-                        <div>${w.surah} - Verset ${w.ayah} | Valeur: ${w.value}</div>
-                    </div>`;
-                });
-            }
-
-            if (results.surahs.length === 0 && results.verses.length === 0 && results.words.length === 0) {
-                html += '<div class="no-results">Aucun résultat trouvé</div>';
-            }
-
-            resultsDiv.innerHTML = html;
+        function useSuggestion(text) {
+            document.getElementById('userInput').value = text;
+            sendMessage();
         }
     </script>
 </body>
