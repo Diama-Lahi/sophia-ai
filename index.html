@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sophia AI - AdadFinder</title>
-    <script src="data.js"></script>
-<script src="quran-api.js"></script>
-<script src="search-engine.js"></script>
+    
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#d4af37">
     <link rel="manifest" href="manifest.json">
@@ -89,6 +87,7 @@
             max-height: 500px;
             overflow-y: auto;
             margin-bottom: 20px;
+            min-height: 300px;
         }
 
         .message {
@@ -96,6 +95,8 @@
             padding: 12px 16px;
             border-radius: 10px;
             animation: fadeIn 0.3s;
+            white-space: pre-wrap;
+            line-height: 1.6;
         }
 
         @keyframes fadeIn {
@@ -156,6 +157,7 @@
             transition: right 0.3s;
             padding: 20px;
             overflow-y: auto;
+            z-index: 999;
         }
 
         .history-panel.open {
@@ -186,6 +188,28 @@
             cursor: pointer;
             font-size: 20px;
             z-index: 1000;
+        }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .suggestion-btn {
+            background: var(--border-color);
+            border: 1px solid var(--accent-gold);
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .suggestion-btn:hover {
+            background: var(--accent-gold);
+            color: white;
         }
 
         /* Responsive */
@@ -221,13 +245,39 @@
         </div>
 
         <div class="chat-container">
-            <div class="messages" id="messages"></div>
+            <div class="suggestions" id="suggestions">
+                <button class="suggestion-btn" onclick="useSuggestion('2713 correspond quel verset ?')">2713 = quel verset ?</button>
+                <button class="suggestion-btn" onclick="useSuggestion('valeur de محمد')">valeur de محمد</button>
+                <button class="suggestion-btn" onclick="useSuggestion('99 noms d\'Allah')">99 noms d'Allah</button>
+                <button class="suggestion-btn" onclick="useSuggestion('sourate Fatiha')">Sourate Fatiha</button>
+                <button class="suggestion-btn" onclick="useSuggestion('aide')">Aide</button>
+            </div>
+            
+            <div class="messages" id="messages">
+                <div class="message ai-message">
+                    🌙 Bienvenue sur Sophia AI ! Je suis spécialisée dans la numérologie islamique et les valeurs Abjad.
+                    
+                    Vous pouvez me demander :
+                    • "2713 correspond quel verset ?"
+                    • "valeur de محمد"
+                    • "99 noms d'Allah"
+                    • "sourate Fatiha"
+                    
+                    Tapez "aide" pour voir tous les exemples !
+                </div>
+            </div>
             
             <div class="input-container">
                 <input type="text" id="userInput" placeholder="Posez votre question..." onkeypress="handleKeyPress(event)">
                 <button class="send-btn" onclick="sendMessage()">Envoyer</button>
             </div>
         </div>
+        
+        <p style="text-align: center; margin-top: 20px;">
+            <a href="https://adadfinder.com" target="_blank" style="color: var(--accent-gold); text-decoration: none;">
+                🔗 Visiter adadfinder.com
+            </a>
+        </p>
     </div>
 
     <div class="history-panel" id="historyPanel">
@@ -238,6 +288,11 @@
         </button>
     </div>
 
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="quran-api.js"></script>
+    <script src="search-engine.js"></script>
+    
     <script>
         // ===== MODE SOMBRE/CLAIR =====
         function toggleTheme() {
@@ -282,7 +337,7 @@
             const historyList = document.getElementById('historyList');
             historyList.innerHTML = '';
             
-            conversations.reverse().forEach(conv => {
+            conversations.slice().reverse().forEach(conv => {
                 const item = document.createElement('div');
                 item.className = 'history-item';
                 item.innerHTML = `
@@ -324,6 +379,11 @@
             }
         }
 
+        function useSuggestion(text) {
+            document.getElementById('userInput').value = text;
+            sendMessage();
+        }
+
         function sendMessage() {
             const input = document.getElementById('userInput');
             const text = input.value.trim();
@@ -333,16 +393,16 @@
             displayMessage(text, 'user');
             input.value = '';
 
-            // Simuler une réponse IA (à remplacer par ton API)
+            // Utiliser le moteur de recherche
             setTimeout(() => {
-                const response = getAIResponse(text);
-                displayMessage(response, 'ai');
+                const response = searchEngine.search(text);
+                displayMessage(response || getFallbackResponse(text), 'ai');
                 
                 // Sauvegarder après chaque échange
                 if (currentConversation.length >= 2) {
                     saveConversation();
                 }
-            }, 500);
+            }, 300);
         }
 
         function handleKeyPress(event) {
@@ -351,17 +411,37 @@
             }
         }
 
-        function getAIResponse(text) {
-            // Logique de réponse basique - à remplacer par ton système
-            if (text.toLowerCase().includes('abjad')) {
-                return "La valeur Abjad est un système de numérotation des lettres arabes...";
+        function getFallbackResponse(text) {
+            text = text.toLowerCase();
+            
+            if (text.includes("abjad")) {
+                return "La valeur Abjad est un système de numérotation des lettres arabes. Chaque lettre a une valeur numérique spécifique.\n\nTu peux me demander :\n• '2713 correspond quel verset ?'\n• 'valeur de محمد'\n• '99 noms d'Allah'";
             }
-            return "Je suis Sophia AI, spécialisée dans la numérologie islamique. Posez-moi une question sur les valeurs Abjad, les 99 noms d'Allah, ou les sourates !";
+            
+            if (text.includes("aide") || text.includes("help")) {
+                return "🌙 Comment utiliser Sophia AI :\n\n" +
+                       "📖 Recherches disponibles :\n" +
+                       "• Tape un nombre (ex: '2713') pour trouver le verset correspondant\n" +
+                       "• Tape un mot arabe (ex: 'محمد') pour calculer sa valeur Abjad\n" +
+                       "• Tape '99 noms' pour voir les noms d'Allah\n" +
+                       "• Tape 'sourate Fatiha' pour des infos sur une sourate\n\n" +
+                       "💡 Exemples :\n" +
+                       "• 'Que signifie 786 ?'\n" +
+                       "• 'valeur de الرحمن'\n" +
+                       "• 'montre-moi les noms d'Allah'";
+            }
+            
+            return "Je suis Sophia AI, spécialisée dans la numérologie islamique. Je peux vous aider avec :\n\n" +
+                   "🔢 Calcul de valeurs Abjad\n" +
+                   "📖 Correspondances avec les versets du Coran\n" +
+                   "✨ Les 99 Noms d'Allah\n" +
+                   "📚 Informations sur les sourates\n\n" +
+                   "Tapez 'aide' pour voir tous les exemples !";
         }
 
         // ===== PWA =====
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+            navigator.serviceWorker.register('service-worker.js');
         }
     </script>
 </body>
