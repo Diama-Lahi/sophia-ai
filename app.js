@@ -4,6 +4,10 @@ const sendBtn = document.getElementById('send-btn');
 
 const API_URL = 'https://ia-backend-6mtu.onrender.com/chat';
 
+function scrollToChat() {
+    document.getElementById('chat').scrollIntoView({ behavior: 'smooth' });
+}
+
 function getCurrentTime() {
     const now = new Date();
     return now.getHours().toString().padStart(2, '0') + ':' + 
@@ -14,7 +18,6 @@ function addMessage(text, sender, images = []) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
     
-    // Avatar pour Sophia
     if (sender === 'bot') {
         const avatar = document.createElement('div');
         avatar.className = 'message-avatar';
@@ -30,7 +33,6 @@ function addMessage(text, sender, images = []) {
     textDiv.innerHTML = text.replace(/\n/g, '<br>');
     contentDiv.appendChild(textDiv);
     
-    // Ajoute les images si présentes
     if (images && images.length > 0) {
         images.forEach(img => {
             const imgElement = document.createElement('img');
@@ -42,7 +44,6 @@ function addMessage(text, sender, images = []) {
         });
     }
     
-    // Heure du message
     const timeDiv = document.createElement('div');
     timeDiv.className = 'message-time';
     timeDiv.textContent = getCurrentTime();
@@ -64,8 +65,8 @@ function showTyping() {
     typingDiv.appendChild(avatar);
     
     const typingContent = document.createElement('div');
-    typingContent.className = 'typing';
-    typingContent.innerHTML = '<span></span><span></span><span></span>';
+    typingContent.className = 'message-content';
+    typingContent.innerHTML = '<div class="message-text">Sophia écrit...</div>';
     typingDiv.appendChild(typingContent);
     
     chatContainer.appendChild(typingDiv);
@@ -84,7 +85,6 @@ async function sendMessage() {
     addMessage(message, 'user');
     messageInput.value = '';
     
-    // Affiche l'indicateur de frappe
     showTyping();
     
     try {
@@ -98,11 +98,9 @@ async function sendMessage() {
         
         const data = await response.json();
         
-        // Retire l'indicateur de frappe
         removeTyping();
         
         if (data.reply) {
-            // Affiche la réponse avec les images
             addMessage(data.reply, 'bot', data.images || []);
         } else if (data.error) {
             addMessage('Erreur: ' + data.error, 'bot');
@@ -118,7 +116,6 @@ messageInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });
 
-// Focus automatique sur l'input au chargement
 window.addEventListener('load', () => {
     messageInput.focus();
 });
