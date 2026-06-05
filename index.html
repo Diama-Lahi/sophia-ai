@@ -1,379 +1,313 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Assistant IA spécialisé dans la numérologie islamique, les valeurs Abjad et le Coran.">
-    <meta name="theme-color" content="#d4af37">
-    
-    <title data-i18n="title">Sophia AI - AdadFinder</title>
-    
-    <!-- Lien vers ton fichier CSS existant -->
-    <link rel="stylesheet" href="styles.css">
-    
-    <!-- Configuration PWA -->
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Sophia AI - Recherche Abjad Coranique</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f5f5dc 0%, #e8e8c8 100%); color: #2c3e50; min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #d4af37; font-size: 2.5rem; margin-bottom: 10px; }
+        .header p { color: #666; font-size: 0.9rem; }
+        
+        .search-box { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        
+        .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        input[type="number"] { flex: 1; padding: 14px 20px; border: 2px solid #e0e0e0; border-radius: 25px; font-size: 16px; outline: none; }
+        input[type="number"]:focus { border-color: #d4af37; }
+        
+        .system-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
+        .toggle-btn { flex: 1; padding: 10px; border: 2px solid #d4af37; background: white; color: #2c3e50; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
+        .toggle-btn.active { background: #d4af37; color: white; }
+        
+        .search-btn { width: 100%; background: linear-gradient(135deg, #2d5016, #1e360e); color: white; border: none; padding: 14px; border-radius: 25px; cursor: pointer; font-size: 16px; font-weight: 600; }
+        .search-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(45,80,22,0.3); }
+        .search-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .results { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); min-height: 400px; }
+        .results h2 { color: #d4af37; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; }
+        
+        .result-section { margin-bottom: 30px; }
+        .result-section h3 { color: #2d5016; margin-bottom: 15px; font-size: 1.2rem; }
+        
+        .result-item { background: #fafafa; padding: 15px; margin: 10px 0; border-radius: 10px; border-left: 4px solid #d4af37; }
+        .result-item.arabic { font-size: 1.3rem; text-align: right; direction: rtl; margin: 10px 0; color: #2c3e50; }
+        .result-item .meta { font-size: 0.9rem; color: #666; margin-top: 5px; }
+        
+        .loading { text-align: center; padding: 40px; color: #666; }
+        .loading::after { content: '...'; animation: dots 1.5s infinite; }
+        @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
+        
+        .no-results { text-align: center; padding: 40px; color: #999; }
+        
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: #f0f0f0; padding: 15px; border-radius: 10px; text-align: center; }
+        .stat-card .number { font-size: 2rem; color: #d4af37; font-weight: bold; }
+        .stat-card .label { font-size: 0.85rem; color: #666; }
+    </style>
 </head>
 <body>
-
-    <!-- Bouton flottant pour l'historique -->
-    <button class="toggle-history" onclick="toggleHistory()" title="Voir l'historique">📜</button>
-    
     <div class="container">
-        <!-- En-tête avec Titre, Langue et Thème -->
         <div class="header">
             <h1>🌙 Sophia AI</h1>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <select id="lang-selector" onchange="changeLanguage(this.value)" class="lang-select">
-                    <option value="fr">🇫🇷 Français</option>
-                    <option value="en">🇬🇧 English</option>
-                    <option value="ar">🇸🇦 العربية</option>
-                </select>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Changer de thème">
-                    <span id="theme-icon">🌙</span>
-                </button>
-            </div>
+            <p>Recherche Abjad dans le Coran - Données réelles via API Alquran.cloud</p>
         </div>
 
-        <!-- Zone principale du Chat -->
-        <div class="chat-container">
-            <!-- Suggestions de questions rapides -->
-            <div class="suggestions" id="suggestions">
-                <!-- Rempli dynamiquement par JavaScript -->
+        <div class="search-box">
+            <div class="input-group">
+                <input type="number" id="searchValue" placeholder="Entrez une valeur (ex: 2713)" min="1">
             </div>
             
-            <!-- Zone d'affichage des messages -->
-            <div class="messages" id="messages">
-                <div class="message ai-message" id="welcome-message">
-                    <!-- Rempli dynamiquement par JavaScript -->
-                </div>
+            <div class="system-toggle">
+                <button class="toggle-btn active" onclick="setSystem('mashriqi')" id="btn-mashriqi">📖 Oriental (Mashriqi)</button>
+                <button class="toggle-btn" onclick="setSystem('maghribi')" id="btn-maghribi">🕌 Maghrébin (Maghribi)</button>
             </div>
             
-            <!-- Zone de saisie -->
-            <div class="input-container">
-                <input type="text" id="userInput" data-i18n-placeholder="placeholder" placeholder="Posez votre question..." onkeypress="handleKeyPress(event)">
-                <button class="send-btn" data-i18n="send" onclick="sendMessage()">Envoyer</button>
-            </div>
+            <button class="search-btn" onclick="searchByValue()" id="searchBtn">🔍 Rechercher dans le Coran</button>
         </div>
-        
-        <!-- Lien vers le site principal -->
-        <p style="text-align: center; margin-top: 20px; font-size: 14px;">
-            <a href="https://adadfinder.com" target="_blank" style="color: var(--accent-gold); text-decoration: none; font-weight: bold;">
-                🔗 Visiter le site principal : adadfinder.com
-            </a>
-        </p>
+
+        <div class="results" id="results">
+            <h2>Résultats de recherche</h2>
+            <p style="text-align: center; color: #999; padding: 40px;">
+                Entrez une valeur numérique et cliquez sur "Rechercher" pour trouver les sourates, versets et mots correspondants dans le Coran.
+            </p>
+        </div>
     </div>
 
-    <!-- Panneau latéral de l'historique -->
-    <div class="history-panel" id="historyPanel">
-        <h2 data-i18n="history">Historique</h2>
-        <div id="historyList">
-            <!-- Les conversations seront listées ici -->
-        </div>
-        <button onclick="clearHistory()" class="btn-clear" data-i18n="clearHistory">
-            Effacer tout l'historique
-        </button>
-    </div>
-
-    <!-- ========================================================= -->
-    <!-- CHARGEMENT DES FICHIERS EXTERNES (Dans l'ordre strict)    -->
-    <!-- ========================================================= -->
-    <script src="translations.js"></script>
-    <script src="data.js"></script>
-    <script src="search-engine.js"></script>
-
-    <!-- ========================================================= -->
-    <!-- LOGIQUE COMPLÈTE DE L'APPLICATION (Aucun raccourci)       -->
-    <!-- ========================================================= -->
     <script>
         // ==========================================
-        // 1. GESTION DES LANGUES (I18N)
+        // VALEURS ABJAD (Orientale et Maghrébine)
         // ==========================================
-        const TRANSLATIONS = {
-            fr: {
-                title: "Sophia AI - AdadFinder",
-                placeholder: "Posez votre question sur les valeurs Abjad...",
-                send: "Envoyer",
-                history: "Historique des conversations",
-                clearHistory: "🗑️ Effacer tout l'historique",
-                welcome: "🌙 Bienvenue sur Sophia AI !\nJe suis spécialisée dans la numérologie islamique, les valeurs Abjad et le Coran.\n\nExemples de questions :\n• '2713 correspond à quel verset ?'\n• 'Quelle est la valeur de محمد ?'\n• 'Donne-moi les 99 noms d'Allah'",
-                suggestions: ["2713 = quel verset ?", "valeur de محمد", "99 noms d'Allah", "Sourate Al-Fatiha", "Aide"],
-                prefixes: {
-                    abjadResult: "📖 Résultats pour la valeur Abjad",
-                    verse: "🕌 **Verset Coranique**",
-                    nameOfAllah: "✨ **Nom d'Allah**",
-                    famousWord: "📝 **Mot célèbre**",
-                    theme: "🎯 Thème",
-                    translation: "💭 Traduction",
-                    value: "🔢 Valeur Abjad de",
-                    notFound: "❌ Je n'ai pas trouvé de correspondance pour cette valeur dans ma base de données.",
-                    help: "🌙 **Comment utiliser Sophia AI :**\n\n1️⃣ Tapez un **nombre** (ex: 786) pour trouver le verset correspondant.\n2️⃣ Tapez un **mot arabe** (ex: الله) pour calculer sa valeur Abjad.\n3️⃣ Tapez **'99 noms'** pour voir la liste des noms d'Allah.\n4️⃣ Tapez **'Sourate'** + un nom pour avoir des informations."
-                }
+        const ABJAD_VALUES = {
+            mashriqi: {
+                'ا': 1, 'ب': 2, 'ج': 3, 'د': 4, 'ه': 5, 'و': 6, 'ز': 7, 'ح': 8, 'ط': 9,
+                'ي': 10, 'ك': 20, 'ل': 30, 'م': 40, 'ن': 50, 'س': 60, 'ع': 70, 'ف': 80, 'ص': 90,
+                'ق': 100, 'ر': 200, 'ش': 300, 'ت': 400, 'ث': 500, 'خ': 600, 'ذ': 700, 'ض': 800, 'ظ': 900, 'غ': 1000
             },
-            en: {
-                title: "Sophia AI - AdadFinder",
-                placeholder: "Ask your question about Abjad values...",
-                send: "Send",
-                history: "Conversation History",
-                clearHistory: "🗑️ Clear all history",
-                welcome: "🌙 Welcome to Sophia AI!\nI specialize in Islamic numerology, Abjad values, and the Quran.\n\nExample questions:\n• 'Which verse corresponds to 2713?'\n• 'What is the value of محمد?'\n• 'Give me the 99 Names of Allah'",
-                suggestions: ["2713 = which verse?", "value of محمد", "99 Names of Allah", "Surah Al-Fatiha", "Help"],
-                prefixes: {
-                    abjadResult: "📖 Results for Abjad value",
-                    verse: "🕌 **Quranic Verse**",
-                    nameOfAllah: "✨ **Name of Allah**",
-                    famousWord: "📝 **Famous Word**",
-                    theme: "🎯 Theme",
-                    translation: "💭 Translation",
-                    value: "🔢 Abjad value of",
-                    notFound: "❌ I did not find any correspondence for this value in my database.",
-                    help: "🌙 **How to use Sophia AI:**\n\n1️⃣ Type a **number** (e.g., 786) to find the corresponding verse.\n2️⃣ Type an **Arabic word** (e.g., الله) to calculate its Abjad value.\n3️⃣ Type **'99 names'** to see the Names of Allah.\n4️⃣ Type **'Surah'** + a name for information."
-                }
-            },
-            ar: {
-                title: "صوفيا أيه - عداد فايندر",
-                placeholder: "اطرح سؤالك حول القيم الأبجدية...",
-                send: "إرسال",
-                history: "سجل المحادثات",
-                clearHistory: "🗑️ مسح السجل بالكامل",
-                welcome: "🌙 مرحباً بك في صوفيا أيه!\nأنا متخصصة في الحساب الأبجدي الإسلامي وقيم الأبجد والقرآن الكريم.\n\nأمثلة على الأسئلة:\n• 'ما هي الآية المقابلة لـ 2713؟'\n• 'ما هي قيمة محمد؟'\n• 'أعطني أسماء الله الحسنى'",
-                suggestions: ["2713 = أي آية؟", "قيمة محمد", "أسماء الله الحسنى", "سورة الفاتحة", "مساعدة"],
-                prefixes: {
-                    abjadResult: "📖 نتائج القيمة الأبجدية",
-                    verse: "🕌 **آية قرآنية**",
-                    nameOfAllah: "✨ **اسم من أسماء الله**",
-                    famousWord: "📝 **كلمة مشهورة**",
-                    theme: "🎯 الموضوع",
-                    translation: "💭 الترجمة",
-                    value: "🔢 القيمة الأبجدية لـ",
-                    notFound: "❌ لم أجد أي تطابق لهذه القيمة في قاعدة البيانات الخاصة بي.",
-                    help: "🌙 **كيفية استخدام صوفيا أيه:**\n\n1️⃣ اكتب **رقماً** (مثال: 786) للعثور على الآية المقابلة.\n2️⃣ اكتب **كلمة عربية** (مثال: الله) لحساب قيمتها الأبجدية.\n3️⃣ اكتب **'أسماء الله'** لرؤية أسماء الله الحسنى.\n4️⃣ اكتب **'سورة'** + اسم للحصول على معلومات."
-                }
+            maghribi: {
+                'ا': 1, 'ب': 2, 'ج': 3, 'د': 4, 'ه': 5, 'و': 6, 'ز': 7, 'ح': 8, 'ط': 9,
+                'ي': 10, 'ك': 20, 'ل': 30, 'م': 40, 'ن': 50, 'ص': 60, 'ع': 70, 'ف': 80, 'ض': 90,
+                'ق': 100, 'ر': 200, 'س': 300, 'ت': 400, 'ث': 500, 'خ': 600, 'ذ': 700, 'ظ': 800, 'غ': 900, 'ش': 1000
             }
         };
 
-        let currentLang = localStorage.getItem('sophia_lang') || 'fr';
+        let currentSystem = 'mashriqi';
+        let quranData = null;
 
-        function t(key) {
-            const keys = key.split('.');
-            let value = TRANSLATIONS[currentLang];
-            for (let k of keys) {
-                value = value ? value[k] : key;
+        // ==========================================
+        // FONCTIONS DE CALCUL ABJAD
+        // ==========================================
+        function calculateAbjad(text) {
+            let total = 0;
+            for (let char of text) {
+                if (ABJAD_VALUES[currentSystem][char]) {
+                    total += ABJAD_VALUES[currentSystem][char];
+                }
             }
-            return value || key;
+            return total;
         }
 
-        function changeLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('sophia_lang', lang);
-            
-            // Gestion de la direction du texte (RTL pour l'arabe)
-            document.documentElement.lang = lang;
-            document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
-            
-            // Mise à jour de tous les textes statiques
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                el.textContent = t(el.getAttribute('data-i18n'));
-            });
-            
-            // Mise à jour des placeholders
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-                el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
-            });
-            
-            // Mise à jour du message de bienvenue et des suggestions
-            document.getElementById('welcome-message').textContent = t('welcome');
-            renderSuggestions();
-            document.getElementById('lang-selector').value = lang;
-        }
-
-        function renderSuggestions() {
-            const container = document.getElementById('suggestions');
-            container.innerHTML = '';
-            const suggestionsList = t('suggestions');
-            suggestionsList.forEach(text => {
-                const btn = document.createElement('button');
-                btn.className = 'suggestion-btn';
-                btn.textContent = text;
-                btn.onclick = () => {
-                    document.getElementById('userInput').value = text;
-                    sendMessage();
-                };
-                container.appendChild(btn);
-            });
+        function setSystem(system) {
+            currentSystem = system;
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${system}`).classList.add('active');
         }
 
         // ==========================================
-        // 2. GESTION DU THÈME (Sombre / Clair)
+        // API ALQURAN.CLOUD
         // ==========================================
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            document.getElementById('theme-icon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
-        }
+        async function loadQuranData() {
+            if (quranData) return quranData;
 
-        // ==========================================
-        // 3. GESTION DE L'HISTORIQUE DES CONVERSATIONS
-        // ==========================================
-        let conversations = JSON.parse(localStorage.getItem('conversations')) || [];
-        let currentConversation = [];
-
-        function toggleHistory() {
-            document.getElementById('historyPanel').classList.toggle('open');
-            loadHistory();
-        }
-
-        function saveConversation() {
-            if (currentConversation.length > 0) {
-                const title = currentConversation[0].text.substring(0, 30) + '...';
-                conversations.push({
-                    id: Date.now(),
-                    title: title,
-                    messages: currentConversation,
-                    date: new Date().toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : (currentLang === 'ar' ? 'ar-SA' : 'en-US'))
-                });
-                localStorage.setItem('conversations', JSON.stringify(conversations));
-                currentConversation = []; // Réinitialiser pour la prochaine conversation
+            try {
+                const response = await fetch('https://api.alquran.cloud/v1/quran/quran-uthmani');
+                const data = await response.json();
+                
+                if (data.code === 200) {
+                    quranData = data.data.surahs;
+                    return quranData;
+                }
+            } catch (error) {
+                console.error('Erreur API:', error);
+                throw error;
             }
         }
 
-        function loadHistory() {
-            const historyList = document.getElementById('historyList');
-            historyList.innerHTML = '';
-            
-            if (conversations.length === 0) {
-                historyList.innerHTML = '<p style="text-align:center; color: #888; margin-top:20px;">Aucun historique</p>';
+        // ==========================================
+        // RECHERCHE PAR VALEUR
+        // ==========================================
+        async function searchByValue() {
+            const value = parseInt(document.getElementById('searchValue').value);
+            if (!value || value < 1) {
+                alert('Veuillez entrer une valeur valide');
                 return;
             }
 
-            conversations.slice().reverse().forEach(conv => {
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerHTML = `
-                    <strong>${conv.title}</strong>
-                    <br><small style="color: #888;">${conv.date}</small>
-                `;
-                item.onclick = () => {
-                    document.getElementById('messages').innerHTML = '';
-                    conv.messages.forEach(msg => displayMessage(msg.text, msg.type, false));
-                    toggleHistory(); // Fermer le panneau après sélection
+            const resultsDiv = document.getElementById('results');
+            const searchBtn = document.getElementById('searchBtn');
+            
+            searchBtn.disabled = true;
+            resultsDiv.innerHTML = '<div class="loading">Chargement des données du Coran et calcul en cours</div>';
+
+            try {
+                const surahs = await loadQuranData();
+                const results = {
+                    surahs: [],
+                    verses: [],
+                    words: []
                 };
-                historyList.appendChild(item);
-            });
-        }
 
-        function clearHistory() {
-            const confirmMsg = currentLang === 'ar' ? 'هل أنت متأكد من مسح السجل؟' : 
-                               (currentLang === 'en' ? 'Are you sure you want to clear all history?' : 'Êtes-vous sûr de vouloir effacer tout l\'historique ?');
-            if (confirm(confirmMsg)) {
-                conversations = [];
-                localStorage.removeItem('conversations');
-                loadHistory();
-            }
-        }
-
-        // ==========================================
-        // 4. GESTION DU CHAT ET DE L'IA
-        // ==========================================
-        function displayMessage(text, type, save = true) {
-            const messagesDiv = document.getElementById('messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}-message`;
-            messageDiv.textContent = text;
-            messagesDiv.appendChild(messageDiv);
-            
-            // Scroll automatique vers le bas
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-            if (save) {
-                currentConversation.push({ text, type, time: Date.now() });
-            }
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-            
-            if (!text) return;
-
-            // Afficher le message de l'utilisateur
-            displayMessage(text, 'user');
-            input.value = '';
-
-            // Simuler un petit délai de réflexion de l'IA
-            setTimeout(() => {
-                // 1. Essayer de trouver une réponse via le moteur de recherche Abjad
-                let response = null;
-                if (typeof searchEngine !== 'undefined') {
-                    response = searchEngine.search(text);
+                // 1. Chercher dans les sourates (nom et numéro)
+                for (let surah of surahs) {
+                    // Valeur du nom de la sourate
+                    const nameValue = calculateAbjad(surah.name);
+                    if (nameValue === value) {
+                        results.surahs.push({
+                            type: 'name',
+                            number: surah.number,
+                            name: surah.name,
+                            englishName: surah.englishName,
+                            value: nameValue
+                        });
+                    }
+                    
+                    // Numéro de la sourate
+                    if (surah.number === value) {
+                        results.surahs.push({
+                            type: 'number',
+                            number: surah.number,
+                            name: surah.name,
+                            englishName: surah.englishName,
+                            value: surah.number
+                        });
+                    }
                 }
-                
-                // 2. Si aucune réponse structurée, utiliser la réponse de secours
-                if (!response) {
-                    response = getFallbackResponse(text);
-                }
-                
-                displayMessage(response, 'ai');
-                
-                // Sauvegarder la conversation si elle contient au moins 2 messages (1 user + 1 IA)
-                if (currentConversation.length >= 2) {
-                    saveConversation();
-                }
-            }, 400);
-        }
 
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
+                // 2. Chercher dans les versets
+                for (let surah of surahs) {
+                    for (let ayah of surah.ayahs) {
+                        const ayahValue = calculateAbjad(ayah.text);
+                        if (ayahValue === value) {
+                            results.verses.push({
+                                surah: surah.englishName,
+                                surahArabic: surah.name,
+                                number: ayah.numberInSurah,
+                                text: ayah.text,
+                                value: ayahValue
+                            });
+                        }
+                    }
+                }
 
-        function getFallbackResponse(text) {
-            const lowerText = text.toLowerCase();
-            
-            // Détection des mots-clés d'aide dans les 3 langues
-            if (lowerText.includes("aide") || lowerText.includes("help") || lowerText.includes("مساعدة") || lowerText.includes("كيف")) {
-                return t('prefixes.help');
+                // 3. Chercher dans les mots individuels (limité aux 100 premiers pour la performance)
+                let wordCount = 0;
+                for (let surah of surahs.slice(0, 10)) {
+                    if (wordCount >= 100) break;
+                    for (let ayah of surah.ayahs.slice(0, 5)) {
+                        const words = ayah.text.split(' ');
+                        for (let word of words) {
+                            if (wordCount >= 100) break;
+                            const wordValue = calculateAbjad(word);
+                            if (wordValue === value) {
+                                results.words.push({
+                                    word: word,
+                                    surah: surah.englishName,
+                                    ayah: ayah.numberInSurah,
+                                    value: wordValue
+                                });
+                                wordCount++;
+                            }
+                        }
+                    }
+                }
+
+                displayResults(value, results);
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="no-results">❌ Erreur lors du chargement des données. Vérifiez votre connexion internet.</div>`;
+            } finally {
+                searchBtn.disabled = false;
             }
-            
-            // Réponse par défaut si l'IA ne comprend pas la requête
-            const defaultResponses = {
-                fr: "Je suis Sophia AI, spécialisée dans les valeurs Abjad et le Coran. Tapez 'Aide' pour voir ce que je peux faire.",
-                en: "I am Sophia AI, specialized in Abjad values and the Quran. Type 'Help' to see what I can do.",
-                ar: "أنا صوفيا أيه، متخصصة في القيم الأبجدية والقرآن. اكتب 'مساعدة' لمعرفة ما يمكنني فعله."
-            };
-            
-            return defaultResponses[currentLang] || defaultResponses['fr'];
         }
 
         // ==========================================
-        // 5. INITIALISATION AU CHARGEMENT DE LA PAGE
+        // AFFICHAGE DES RÉSULTATS
         // ==========================================
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. Charger le thème sauvegardé
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            document.getElementById('theme-icon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        function displayResults(value, results) {
+            const resultsDiv = document.getElementById('results');
             
-            // 2. Charger la langue sauvegardée
-            changeLanguage(currentLang);
+            let html = `<h2>Résultats pour la valeur ${value} (Système ${currentSystem === 'mashriqi' ? 'Oriental' : 'Maghrébin'})</h2>`;
             
-            // 3. Enregistrer le Service Worker pour la PWA
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(registration => {
-                        console.log('Service Worker enregistré avec succès:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Échec de l\'enregistrement du Service Worker:', error);
-                    });
+            // Statistiques
+            html += `
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="number">${results.surahs.length}</div>
+                        <div class="label">Sourates trouvées</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">${results.verses.length}</div>
+                        <div class="label">Versets trouvés</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">${results.words.length}</div>
+                        <div class="label">Mots trouvés</div>
+                    </div>
+                </div>
+            `;
+
+            // Sourates
+            if (results.surahs.length > 0) {
+                html += '<div class="result-section"><h3>📖 Sourates</h3>';
+                results.surahs.forEach(s => {
+                    html += `
+                        <div class="result-item">
+                            <strong>Sourate ${s.number}: ${s.englishName}</strong>
+                            <div class="arabic">${s.name}</div>
+                            <div class="meta">Type: ${s.type === 'name' ? 'Valeur du nom' : 'Numéro de sourate'} | Valeur: ${s.value}</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
             }
-        });
+
+            // Versets
+            if (results.verses.length > 0) {
+                html += '<div class="result-section"><h3>🕌 Versets</h3>';
+                results.verses.forEach(v => {
+                    html += `
+                        <div class="result-item">
+                            <strong>${v.surah} (${v.surahArabic}) - Verset ${v.number}</strong>
+                            <div class="arabic">${v.text}</div>
+                            <div class="meta">Valeur Abjad: ${v.value}</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            // Mots
+            if (results.words.length > 0) {
+                html += '<div class="result-section"><h3>📝 Mots</h3>';
+                results.words.forEach(w => {
+                    html += `
+                        <div class="result-item">
+                            <div class="arabic">${w.word}</div>
+                            <div class="meta">${w.surah} - Verset ${w.ayah} | Valeur: ${w.value}</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            // Aucun résultat
+            if (results.surahs.length === 0 && results.verses.length === 0 && results.words.length === 0) {
+                html += '<div class="no-results">Aucun résultat trouvé pour cette valeur dans le Coran.</div>';
+            }
+
+            resultsDiv.innerHTML = html;
+        }
     </script>
 </body>
 </html>
