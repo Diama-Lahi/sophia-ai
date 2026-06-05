@@ -1,50 +1,122 @@
-import os
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from groq import Groq
+const chatContainer = document.getElementById('chat-container');
+const messageInput = document.getElementById('message-input');
+const sendBtn = document.getElementById('send-btn');
 
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+const API_URL = 'https://ia-backend-6mtu.onrender.com/chat';
 
-groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+function scrollToChat() {
+    const chatSection = document.getElementById('chat');
+    if (chatSection) {
+        chatSection.scrollIntoView({ behavior: 'smooth' });
+    }
+}
 
-ADAD_FINDER_PERSONALITY = """Tu es l'assistant IA d'AdadFinder.
-Ton rôle est d'aider les utilisateurs à comprendre et utiliser AdadFinder.
-Sois professionnel, courtois et utile.
-Réponds en français de manière claire et concise.
-Si tu ne connais pas la réponse, dis-le honnêtement.
-"""
+function getCurrentTime() {
+    const now = new Date();
+    return now.getHours().toString().padStart(2, '0') + ':' + 
+           now.getMinutes().toString().padStart(2, '0');
+}
 
-@app.route("/", methods=["GET"])
-def home():
-    return jsonify({"status": "OK", "message": "AdadFinder AI est en ligne"}), 200
+function askSuggestion(text) {
+    messageInput.value = text;
+    sendMessage();
+}
 
-@app.route("/chat", methods=["POST"])
-def chat():
-    data = request.get_json() or {}
-    user_message = data.get("message", "")
+function addMessage(text, sender) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
     
-    if not user_message:
-        return jsonify({"error": "Message vide"}), 400
+    if (sender === 'bot') {
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.textContent = '☪';
+        messageDiv.appendChild(avatar);
+    }
     
-    try:
-        r = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": ADAD_FINDER_PERSONALITY},
-                {"role": "user", "content": user_message}
-            ],
-            temperature=0.7,
-            max_tokens=500
-        )
-        
-        reply = r.choices[0].message.content
-        
-        return jsonify({"reply": reply})
-        
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    
+    const textDiv = document.createElement('div');
+    textDiv.className = 'message-text';
+    // Convertit les sauts de ligne et formatage basique
+    textDiv.innerHTML = text
+        .replace(/\n/g, '<br>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+    contentDiv.appendChild(textDiv);
+    
+    const timeDiv = document.createElement('div');
+    timeDiv.className = 'message-time';
+    timeDiv.textContent = getCurrentTime();
+    contentDiv.appendChild(timeDiv);
+    
+    messageDiv.appendChild(contentDiv);
+    chatContainer.appendChild(messageDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
 
-if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8000))
-    app.run(host="0.0.0.0", port=port)
+function showTyping() {
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message bot';
+    typingDiv.id = 'typing-indicator';
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = '☪';
+    typingDiv.appendChild(avatar);
+    
+    const typingContent = document.createElement('div');
+    typingContent.className = 'message-content';
+    typingContent.innerHTML = '<div class="message-text">L\'assistant réfléchit... 🌙</div>';
+    typingDiv.appendChild(typingContent);
+    
+    chatContainer.appendChild(typingDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function removeTyping() {
+    const typing = document.getElementById('typing-indicator');
+    if (typing) typing.remove();
+}
+
+async function sendMessage() {
+    const message = messageInput.value.trim();
+    if (!message) return;
+    
+    addMessage(message, 'user');
+    messageInput.value = '';
+    
+    showTyping();
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: message })
+        });
+        
+        const data = await response.json();
+        
+        removeTyping();
+        
+        if (data.reply) {
+            addMessage(data.reply, 'bot');
+        } else if (data.error) {
+            addMessage('Erreur: ' + data.error, 'bot');
+        }
+    } catch (error) {
+        removeTyping();
+        addMessage('Erreur de connexion. Veuillez réessayer plus tard.', 'bot');
+    }
+}
+
+sendBtn.addEventListener('click', sendMessage);
+messageInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') sendMessage();
+});
+
+window.addEventListener('load', function() {
+    messageInput.focus();
+});
