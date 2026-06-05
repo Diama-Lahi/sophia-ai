@@ -1,55 +1,68 @@
-const API = "https://ia-backend-6mtu.onrender.com";
+const chatContainer = document.getElementById('chat-container');
+const messageInput = document.getElementById('message-input');
+const sendBtn = document.getElementById('send-btn');
 
-const chatBox = document.getElementById("chat-box");
-const input = document.getElementById("user-input");
-const sendBtn = document.getElementById("send-btn");
+const API_URL = 'https://ia-backend-6mtu.onrender.com/chat';
 
-function addMessage(text, sender) {
-  const div = document.createElement("div");
-  div.className = "message " + sender;
-  div.textContent = text;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
+function addMessage(text, sender, images = []) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    
+    const textDiv = document.createElement('div');
+    textDiv.className = 'message-text';
+    textDiv.textContent = text;
+    messageDiv.appendChild(textDiv);
+    
+    // ✅ Ajoute les images si présentes
+    if (images && images.length > 0) {
+        images.forEach(img => {
+            const imgElement = document.createElement('img');
+            imgElement.src = img.url;
+            imgElement.alt = img.description;
+            imgElement.className = 'message-image';
+            imgElement.style.maxWidth = '100%';
+            imgElement.style.borderRadius = '10px';
+            imgElement.style.marginTop = '10px';
+            imgElement.style.cursor = 'pointer';
+            imgElement.onclick = () => window.open(img.url, '_blank');
+            messageDiv.appendChild(imgElement);
+        });
+    }
+    
+    chatContainer.appendChild(messageDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-sendBtn.onclick = async () => {
-  const msg = input.value.trim();
-  if (!msg) return;
+async function sendMessage() {
+    const message = messageInput.value.trim();
+    if (!message) return;
+    
+    addMessage(message, 'user');
+    messageInput.value = '';
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message })
+        });
+        
+        const data = await response.json();
+        
+        if (data.reply) {
+            // ✅ Affiche la réponse avec les images
+            addMessage(data.reply, 'bot', data.images || []);
+        } else if (data.error) {
+            addMessage('Erreur: ' + data.error, 'bot');
+        }
+    } catch (error) {
+        addMessage('Erreur de connexion. Réessaie plus tard.', 'bot');
+    }
+}
 
-  addMessage(msg, "user");
-  input.value = "";
-
-  const res = await fetch(API + "/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: msg })
-  });
-
-  const data = await res.json();
-  addMessage(data.reply, "bot");
-};
-
-// Image editing
-document.getElementById("edit-btn").onclick = async () => {
-  const file = document.getElementById("image-input").files[0];
-  const prompt = document.getElementById("image-prompt").value;
-
-  if (!file || !prompt) return alert("Image + prompt obligatoires");
-
-  const form = new FormData();
-  form.append("image", file);
-  form.append("prompt", prompt);
-
-  const res = await fetch(API + "/image-edit", {
-    method: "POST",
-    body: form
-  });
-
-  const data = await res.json();
-
-  const img = document.createElement("img");
-  img.src = "data:image/png;base64," + data.image_base64;
-  img.style.width = "100%";
-
-  chatBox.appendChild(img);
-};
+sendBtn.addEventListener('click', sendMessage);
+messageInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+});
