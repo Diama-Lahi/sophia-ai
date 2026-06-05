@@ -3,56 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sophia AI - Recherche Abjad Coranique</title>
+    <title>Sophia AI - Recherche Abjad</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f5f5dc 0%, #e8e8c8 100%); color: #2c3e50; min-height: 100vh; padding: 20px; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: linear-gradient(135deg, #f5f5dc 0%, #e8e8c8 100%); 
+            color: #2c3e50; 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
         .container { max-width: 900px; margin: 0 auto; }
         .header { text-align: center; margin-bottom: 30px; }
         .header h1 { color: #d4af37; font-size: 2.5rem; margin-bottom: 10px; }
-        .header p { color: #666; font-size: 0.9rem; }
         
-        .search-box { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .search-box { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            margin-bottom: 20px; 
+        }
         
         .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        input[type="number"] { flex: 1; padding: 14px 20px; border: 2px solid #e0e0e0; border-radius: 25px; font-size: 16px; outline: none; }
+        input[type="number"] { 
+            flex: 1; 
+            padding: 14px 20px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 25px; 
+            font-size: 16px; 
+            outline: none; 
+        }
         input[type="number"]:focus { border-color: #d4af37; }
         
         .system-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
-        .toggle-btn { flex: 1; padding: 10px; border: 2px solid #d4af37; background: white; color: #2c3e50; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
+        .toggle-btn { 
+            flex: 1; 
+            padding: 10px; 
+            border: 2px solid #d4af37; 
+            background: white; 
+            color: #2c3e50; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        }
         .toggle-btn.active { background: #d4af37; color: white; }
         
-        .search-btn { width: 100%; background: linear-gradient(135deg, #2d5016, #1e360e); color: white; border: none; padding: 14px; border-radius: 25px; cursor: pointer; font-size: 16px; font-weight: 600; }
-        .search-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(45,80,22,0.3); }
+        .search-btn { 
+            width: 100%; 
+            background: linear-gradient(135deg, #2d5016, #1e360e); 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600; 
+        }
+        .search-btn:hover { transform: translateY(-2px); }
         .search-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         
-        .results { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); min-height: 400px; }
-        .results h2 { color: #d4af37; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; }
+        .results { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            min-height: 400px; 
+        }
+        .results h2 { color: #d4af37; margin-bottom: 20px; }
         
-        .result-section { margin-bottom: 30px; }
-        .result-section h3 { color: #2d5016; margin-bottom: 15px; font-size: 1.2rem; }
-        
-        .result-item { background: #fafafa; padding: 15px; margin: 10px 0; border-radius: 10px; border-left: 4px solid #d4af37; }
-        .result-item.arabic { font-size: 1.3rem; text-align: right; direction: rtl; margin: 10px 0; color: #2c3e50; }
-        .result-item .meta { font-size: 0.9rem; color: #666; margin-top: 5px; }
+        .result-item { 
+            background: #fafafa; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 10px; 
+            border-left: 4px solid #d4af37; 
+        }
+        .result-item .arabic { 
+            font-size: 1.3rem; 
+            text-align: right; 
+            direction: rtl; 
+            margin: 10px 0; 
+        }
         
         .loading { text-align: center; padding: 40px; color: #666; }
-        .loading::after { content: '...'; animation: dots 1.5s infinite; }
-        @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
-        
         .no-results { text-align: center; padding: 40px; color: #999; }
         
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: #f0f0f0; padding: 15px; border-radius: 10px; text-align: center; }
+        .stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 20px; 
+        }
+        .stat-card { 
+            background: #f0f0f0; 
+            padding: 15px; 
+            border-radius: 10px; 
+            text-align: center; 
+        }
         .stat-card .number { font-size: 2rem; color: #d4af37; font-weight: bold; }
-        .stat-card .label { font-size: 0.85rem; color: #666; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🌙 Sophia AI</h1>
-            <p>Recherche Abjad dans le Coran - Données réelles via API Alquran.cloud</p>
+            <p>Recherche Abjad dans le Coran</p>
         </div>
 
         <div class="search-box">
@@ -61,25 +117,23 @@
             </div>
             
             <div class="system-toggle">
-                <button class="toggle-btn active" onclick="setSystem('mashriqi')" id="btn-mashriqi">📖 Oriental (Mashriqi)</button>
-                <button class="toggle-btn" onclick="setSystem('maghribi')" id="btn-maghribi">🕌 Maghrébin (Maghribi)</button>
+                <button class="toggle-btn active" onclick="setSystem('mashriqi')" id="btn-mashriqi">📖 Oriental</button>
+                <button class="toggle-btn" onclick="setSystem('maghribi')" id="btn-maghribi">🕌 Maghrébin</button>
             </div>
             
-            <button class="search-btn" onclick="searchByValue()" id="searchBtn">🔍 Rechercher dans le Coran</button>
+            <button class="search-btn" onclick="searchByValue()" id="searchBtn">🔍 Rechercher</button>
         </div>
 
         <div class="results" id="results">
-            <h2>Résultats de recherche</h2>
+            <h2>Résultats</h2>
             <p style="text-align: center; color: #999; padding: 40px;">
-                Entrez une valeur numérique et cliquez sur "Rechercher" pour trouver les sourates, versets et mots correspondants dans le Coran.
+                Entrez une valeur et cliquez sur "Rechercher"
             </p>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // VALEURS ABJAD (Orientale et Maghrébine)
-        // ==========================================
+        // VALEURS ABJAD
         const ABJAD_VALUES = {
             mashriqi: {
                 'ا': 1, 'ب': 2, 'ج': 3, 'د': 4, 'ه': 5, 'و': 6, 'ز': 7, 'ح': 8, 'ط': 9,
@@ -96,9 +150,6 @@
         let currentSystem = 'mashriqi';
         let quranData = null;
 
-        // ==========================================
-        // FONCTIONS DE CALCUL ABJAD
-        // ==========================================
         function calculateAbjad(text) {
             let total = 0;
             for (let char of text) {
@@ -115,16 +166,11 @@
             document.getElementById(`btn-${system}`).classList.add('active');
         }
 
-        // ==========================================
-        // API ALQURAN.CLOUD
-        // ==========================================
         async function loadQuranData() {
             if (quranData) return quranData;
-
             try {
                 const response = await fetch('https://api.alquran.cloud/v1/quran/quran-uthmani');
                 const data = await response.json();
-                
                 if (data.code === 200) {
                     quranData = data.data.surahs;
                     return quranData;
@@ -135,9 +181,6 @@
             }
         }
 
-        // ==========================================
-        // RECHERCHE PAR VALEUR
-        // ==========================================
         async function searchByValue() {
             const value = parseInt(document.getElementById('searchValue').value);
             if (!value || value < 1) {
@@ -149,19 +192,14 @@
             const searchBtn = document.getElementById('searchBtn');
             
             searchBtn.disabled = true;
-            resultsDiv.innerHTML = '<div class="loading">Chargement des données du Coran et calcul en cours</div>';
+            resultsDiv.innerHTML = '<div class="loading">Chargement et calcul en cours...</div>';
 
             try {
                 const surahs = await loadQuranData();
-                const results = {
-                    surahs: [],
-                    verses: [],
-                    words: []
-                };
+                const results = { surahs: [], verses: [], words: [] };
 
-                // 1. Chercher dans les sourates (nom et numéro)
+                // Chercher dans les sourates
                 for (let surah of surahs) {
-                    // Valeur du nom de la sourate
                     const nameValue = calculateAbjad(surah.name);
                     if (nameValue === value) {
                         results.surahs.push({
@@ -172,8 +210,6 @@
                             value: nameValue
                         });
                     }
-                    
-                    // Numéro de la sourate
                     if (surah.number === value) {
                         results.surahs.push({
                             type: 'number',
@@ -185,7 +221,7 @@
                     }
                 }
 
-                // 2. Chercher dans les versets
+                // Chercher dans les versets
                 for (let surah of surahs) {
                     for (let ayah of surah.ayahs) {
                         const ayahValue = calculateAbjad(ayah.text);
@@ -201,7 +237,7 @@
                     }
                 }
 
-                // 3. Chercher dans les mots individuels (limité aux 100 premiers pour la performance)
+                // Chercher dans les mots (limité)
                 let wordCount = 0;
                 for (let surah of surahs.slice(0, 10)) {
                     if (wordCount >= 100) break;
@@ -225,85 +261,56 @@
 
                 displayResults(value, results);
             } catch (error) {
-                resultsDiv.innerHTML = `<div class="no-results">❌ Erreur lors du chargement des données. Vérifiez votre connexion internet.</div>`;
+                resultsDiv.innerHTML = '<div class="no-results">❌ Erreur de chargement. Vérifiez votre connexion.</div>';
             } finally {
                 searchBtn.disabled = false;
             }
         }
 
-        // ==========================================
-        // AFFICHAGE DES RÉSULTATS
-        // ==========================================
         function displayResults(value, results) {
             const resultsDiv = document.getElementById('results');
+            let html = `<h2>Résultats pour ${value} (${currentSystem === 'mashriqi' ? 'Oriental' : 'Maghrébin'})</h2>`;
             
-            let html = `<h2>Résultats pour la valeur ${value} (Système ${currentSystem === 'mashriqi' ? 'Oriental' : 'Maghrébin'})</h2>`;
-            
-            // Statistiques
-            html += `
-                <div class="stats">
-                    <div class="stat-card">
-                        <div class="number">${results.surahs.length}</div>
-                        <div class="label">Sourates trouvées</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="number">${results.verses.length}</div>
-                        <div class="label">Versets trouvés</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="number">${results.words.length}</div>
-                        <div class="label">Mots trouvés</div>
-                    </div>
-                </div>
-            `;
+            html += `<div class="stats">
+                <div class="stat-card"><div class="number">${results.surahs.length}</div><div class="label">Sourates</div></div>
+                <div class="stat-card"><div class="number">${results.verses.length}</div><div class="label">Versets</div></div>
+                <div class="stat-card"><div class="number">${results.words.length}</div><div class="label">Mots</div></div>
+            </div>`;
 
-            // Sourates
             if (results.surahs.length > 0) {
-                html += '<div class="result-section"><h3>📖 Sourates</h3>';
+                html += '<h3>📖 Sourates</h3>';
                 results.surahs.forEach(s => {
-                    html += `
-                        <div class="result-item">
-                            <strong>Sourate ${s.number}: ${s.englishName}</strong>
-                            <div class="arabic">${s.name}</div>
-                            <div class="meta">Type: ${s.type === 'name' ? 'Valeur du nom' : 'Numéro de sourate'} | Valeur: ${s.value}</div>
-                        </div>
-                    `;
+                    html += `<div class="result-item">
+                        <strong>Sourate ${s.number}: ${s.englishName}</strong>
+                        <div class="arabic">${s.name}</div>
+                        <div>Type: ${s.type === 'name' ? 'Nom' : 'Numéro'} | Valeur: ${s.value}</div>
+                    </div>`;
                 });
-                html += '</div>';
             }
 
-            // Versets
             if (results.verses.length > 0) {
-                html += '<div class="result-section"><h3>🕌 Versets</h3>';
+                html += '<h3>🕌 Versets</h3>';
                 results.verses.forEach(v => {
-                    html += `
-                        <div class="result-item">
-                            <strong>${v.surah} (${v.surahArabic}) - Verset ${v.number}</strong>
-                            <div class="arabic">${v.text}</div>
-                            <div class="meta">Valeur Abjad: ${v.value}</div>
-                        </div>
-                    `;
+                    html += `<div class="result-item">
+                        <strong>${v.surah} - Verset ${v.number}</strong>
+                        <div class="arabic">${v.text}</div>
+                        <div>Valeur: ${v.value}</div>
+                    </div>`;
                 });
-                html += '</div>';
             }
 
-            // Mots
             if (results.words.length > 0) {
-                html += '<div class="result-section"><h3>📝 Mots</h3>';
+                html += '<h3>📝 Mots</h3>';
                 results.words.forEach(w => {
-                    html += `
-                        <div class="result-item">
-                            <div class="arabic">${w.word}</div>
-                            <div class="meta">${w.surah} - Verset ${w.ayah} | Valeur: ${w.value}</div>
-                        </div>
-                    `;
+                    html += `<div class="result-item">
+                        <div class="arabic">${w.word}</div>
+                        <div>${w.surah} - Verset ${w.ayah} | Valeur: ${w.value}</div>
+                    </div>`;
                 });
-                html += '</div>';
             }
 
-            // Aucun résultat
             if (results.surahs.length === 0 && results.verses.length === 0 && results.words.length === 0) {
-                html += '<div class="no-results">Aucun résultat trouvé pour cette valeur dans le Coran.</div>';
+                html += '<div class="no-results">Aucun résultat trouvé</div>';
             }
 
             resultsDiv.innerHTML = html;
