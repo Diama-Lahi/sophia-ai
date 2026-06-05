@@ -1,122 +1,20 @@
-const chatContainer = document.getElementById('chat-container');
-const messageInput = document.getElementById('message-input');
-const sendBtn = document.getElementById('send-btn');
+const CACHE_NAME = 'sophia-ai-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/manifest.json'
+];
 
-const API_URL = 'https://ia-backend-6mtu.onrender.com/chat';
-
-function scrollToChat() {
-    const chatSection = document.getElementById('chat');
-    if (chatSection) {
-        chatSection.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-
-function getCurrentTime() {
-    const now = new Date();
-    return now.getHours().toString().padStart(2, '0') + ':' + 
-           now.getMinutes().toString().padStart(2, '0');
-}
-
-function askSuggestion(text) {
-    messageInput.value = text;
-    sendMessage();
-}
-
-function addMessage(text, sender) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}`;
-    
-    if (sender === 'bot') {
-        const avatar = document.createElement('div');
-        avatar.className = 'message-avatar';
-        avatar.textContent = '☪';
-        messageDiv.appendChild(avatar);
-    }
-    
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'message-content';
-    
-    const textDiv = document.createElement('div');
-    textDiv.className = 'message-text';
-    // Convertit les sauts de ligne et formatage basique
-    textDiv.innerHTML = text
-        .replace(/\n/g, '<br>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>');
-    contentDiv.appendChild(textDiv);
-    
-    const timeDiv = document.createElement('div');
-    timeDiv.className = 'message-time';
-    timeDiv.textContent = getCurrentTime();
-    contentDiv.appendChild(timeDiv);
-    
-    messageDiv.appendChild(contentDiv);
-    chatContainer.appendChild(messageDiv);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-}
-
-function showTyping() {
-    const typingDiv = document.createElement('div');
-    typingDiv.className = 'message bot';
-    typingDiv.id = 'typing-indicator';
-    
-    const avatar = document.createElement('div');
-    avatar.className = 'message-avatar';
-    avatar.textContent = '☪';
-    typingDiv.appendChild(avatar);
-    
-    const typingContent = document.createElement('div');
-    typingContent.className = 'message-content';
-    typingContent.innerHTML = '<div class="message-text">L\'assistant réfléchit... 🌙</div>';
-    typingDiv.appendChild(typingContent);
-    
-    chatContainer.appendChild(typingDiv);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-}
-
-function removeTyping() {
-    const typing = document.getElementById('typing-indicator');
-    if (typing) typing.remove();
-}
-
-async function sendMessage() {
-    const message = messageInput.value.trim();
-    if (!message) return;
-    
-    addMessage(message, 'user');
-    messageInput.value = '';
-    
-    showTyping();
-    
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ message: message })
-        });
-        
-        const data = await response.json();
-        
-        removeTyping();
-        
-        if (data.reply) {
-            addMessage(data.reply, 'bot');
-        } else if (data.error) {
-            addMessage('Erreur: ' + data.error, 'bot');
-        }
-    } catch (error) {
-        removeTyping();
-        addMessage('Erreur de connexion. Veuillez réessayer plus tard.', 'bot');
-    }
-}
-
-sendBtn.addEventListener('click', sendMessage);
-messageInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') sendMessage();
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+  );
 });
 
-window.addEventListener('load', function() {
-    messageInput.focus();
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => response || fetch(event.request))
+  );
 });
