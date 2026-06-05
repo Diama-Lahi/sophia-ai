@@ -1,0 +1,15 @@
+{
+  "name": "Sophia AI",
+  "short_name": "Sophia",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6a4bc3",
+  "icons": [
+    {
+      "src": "assets/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
