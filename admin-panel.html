@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Sophia AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; color: #d4af37; margin-bottom: 30px; }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: #2d5016;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab.active { background: #d4af37; color: #000; }
+        
+        .panel {
+            background: rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: 15px;
+            display: none;
+        }
+        .panel.active { display: block; }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #d4af37;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            font-size: 14px;
+        }
+        textarea { min-height: 80px; resize: vertical; }
+        
+        .btn {
+            padding: 12px 24px;
+            background: #d4af37;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        .btn:hover { transform: scale(1.05); }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        
+        .list-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #d4af37;
+        }
+        .list-item h3 { color: #d4af37; margin-bottom: 5px; }
+        .list-item .actions { margin-top: 10px; }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: rgba(212, 175, 55, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #d4af37;
+        }
+        .stat-card .number {
+            font-size: 32px;
+            color: #d4af37;
+            font-weight: bold;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+        .alert.success { background: rgba(39, 174, 96, 0.2); border: 1px solid #27ae60; }
+        .alert.error { background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌙 Administration Sophia AI</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number" id="stat-verses">0</div>
+                <div>Versets</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="stat-names">99</div>
+                <div>Noms d'Allah</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="stat-words">0</div>
+                <div>Mots célèbres</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="stat-surahs">114</div>
+                <div>Sourates</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showPanel('verses')">📖 Versets</button>
+            <button class="tab" onclick="showPanel('names')">✨ Noms d'Allah</button>
+            <button class="tab" onclick="showPanel('words')">📝 Mots célèbres</button>
+            <button class="tab" onclick="showPanel('surahs')">📚 Sourates</button>
+            <button class="tab" onclick="showPanel('export')">💾 Export/Import</button>
+        </div>
+        
+        <div id="alert" class="alert"></div>
+        
+        <!-- Panneau Versets -->
+        <div id="panel-verses" class="panel active">
+            <h2>Ajouter une correspondance Abjad → Verset</h2>
+            <div class="form-group">
+                <label>Valeur Abjad (nombre)</label>
+                <input type="number" id="verse-abjad" placeholder="Ex: 2713">
+            </div>
+            <div class="form-group">
+                <label>Référence du verset</label>
+                <input type="text" id="verse-ref" placeholder="Ex: Al-Baqarah 2:255">
+            </div>
+            <div class="form-group">
+                <label>Texte arabe</label>
+                <textarea id="verse-arabic" dir="rtl" placeholder="اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Traduction française</label>
+                <textarea id="verse-translation" placeholder="Allah ! Point de divinité à part Lui..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Thème</label>
+                <input type="text" id="verse-theme" placeholder="Ex: Ayat al-Kursi">
+            </div>
+            <button class="btn btn-success" onclick="addVerse()">➕ Ajouter</button>
+            
+            <h2 style="margin-top: 30px;">Liste des correspondances</h2>
+            <div id="verses-list"></div>
+        </div>
+        
+        <!-- Panneau Noms d'Allah -->
+        <div id="panel-names" class="panel">
+            <h2>Ajouter un nom d'Allah</h2>
+            <div class="form-group">
+                <label>Nom en arabe</label>
+                <input type="text" id="name-arabic" dir="rtl" placeholder="الرَّحْمَنُ">
+            </div>
+            <div class="form-group">
+                <label>Translittération</label>
+                <input type="text" id="name-translit" placeholder="Ar-Rahman">
+            </div>
+            <div class="form-group">
+                <label>Traduction</label>
+                <input type="text" id="name-translation" placeholder="Le Tout Miséricordieux">
+            </div>
+            <div class="form-group">
+                <label>Valeur Abjad</label>
+                <input type="number" id="name-abjad" placeholder="298">
+            </div>
+            <button class="btn btn-success" onclick="addName()">➕ Ajouter</button>
+            
+            <h2 style="margin-top: 30px;">Liste des noms</h2>
+            <div id="names-list"></div>
+        </div>
+        
+        <!-- Panneau Mots célèbres -->
+        <div id="panel-words" class="panel">
+            <h2>Ajouter un mot célèbre</h2>
+            <div class="form-group">
+                <label>Mot en arabe</label>
+                <input type="text" id="word-arabic" dir="rtl" placeholder="محمد">
+            </div>
+            <div class="form-group">
+                <label>Signification</label>
+                <input type="text" id="word-meaning" placeholder="Muhammad (Prophète)">
+            </div>
+            <div class="form-group">
+                <label>Valeur Abjad</label>
+                <input type="number" id="word-abjad" placeholder="92">
+            </div>
+            <button class="btn btn-success" onclick="addWord()">➕ Ajouter</button>
+            
+            <h2 style="margin-top: 30px;">Liste des mots</h2>
+            <div id="words-list"></div>
+        </div>
+        
+        <!-- Panneau Sourates -->
+        <div id="panel-surahs" class="panel">
+            <h2>Ajouter/Mettre à jour une sourate</h2>
+            <div class="form-group">
+                <label>Numéro de la sourate</label>
+                <input type="number" id="surah-number" placeholder="1" min="1" max="114">
+            </div>
+            <div class="form-group">
+                <label>Nom (translittération)</label>
+                <input type="text" id="surah-name" placeholder="Al-Fatiha">
+            </div>
+            <div class="form-group">
+                <label>Nom en arabe</label>
+                <input type="text" id="surah-arabic" dir="rtl" placeholder="الفاتحة">
+            </div>
+            <div class="form-group">
+                <label>Nombre de versets</label>
+                <input type="number" id="surah-verses" placeholder="7">
+            </div>
+            <div class="form-group">
+                <label>Thème</label>
+                <input type="text" id="surah-theme" placeholder="L'Ouverture">
+            </div>
+            <div class="form-group">
+                <label>Type de révélation</label>
+                <select id="surah-revelation">
+                    <option value="Mecquoise">Mecquoise</option>
+                    <option value="Médinoise">Médinoise</option>
+                </select>
+            </div>
+            <button class="btn btn-success" onclick="addSurah()">➕ Ajouter/Mettre à jour</button>
+            
+            <h2 style="margin-top: 30px;">Liste des sourates</h2>
+            <div id="surahs-list"></div>
+        </div>
+        
+        <!-- Panneau Export/Import -->
+        <div id="panel-export" class="panel">
+            <h2>💾 Exporter / Importer les données</h2>
+            <p style="margin-bottom: 15px; color: #ccc;">Exportez vos données pour les sauvegarder ou les partager.</p>
+            <button class="btn" onclick="exportData()">📤 Exporter en JSON</button>
+            <button class="btn btn-danger" onclick="clearAllData()">🗑️ Effacer toutes les données</button>
+            
+            <div class="form-group" style="margin-top: 20px;">
+                <label>Importer un fichier JSON</label>
+                <input type="file" id="import-file" accept=".json">
+            </div>
+            <button class="btn btn-success" onclick="importData()">📥 Importer</button>
+            
+            <div class="form-group" style="margin-top: 30px;">
+                <label>Code JavaScript généré (à copier dans data.js)</label>
+                <textarea id="generated-code" style="min-height: 200px; font-family: monospace;" readonly></textarea>
+                <button class="btn" onclick="generateCode()" style="margin-top: 10px;">🔄 Générer le code</button>
+                <button class="btn" onclick="copyCode()">📋 Copier</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Charger les données depuis localStorage
+        let data = JSON.parse(localStorage.getItem('sophia_data')) || {
+            verses_by_abjad: {},
+            names_of_allah: [],
+            famous_words: {},
+            surahs: {}
+        };
+
+        function saveData() {
+            localStorage.setItem('sophia_data', JSON.stringify(data));
+            updateStats();
+        }
+
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 3000);
+        }
+
+        function showPanel(name) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`panel-${name}`).classList.add('active');
+            event.target.classList.add('active');
+            loadList(name);
+        }
+
+        function updateStats() {
+            document.getElementById('stat-verses').textContent = Object.keys(data.verses_by_abjad).length;
+            document.getElementById('stat-names').textContent = data.names_of_allah.length;
+            document.getElementById('stat-words').textContent = Object.keys(data.famous_words).length;
+            document.getElementById('stat-surahs').textContent = Object.keys(data.surahs).length;
+        }
+
+        // === AJOUTS ===
+        function addVerse() {
+            const abjad = document.getElementById('verse-abjad').value;
+            if (!abjad) return showAlert('Valeur Abjad requise', 'error');
+            
+            data.verses_by_abjad[abjad] = {
+                verse: document.getElementById('verse-ref').value,
+                arabic: document.getElementById('verse-arabic').value,
+                translation: document.getElementById('verse-translation').value,
+                theme: document.getElementById('verse-theme').value
+            };
+            saveData();
+            showAlert('Verset ajouté !');
+            loadList('verses');
+        }
+
+        function addName() {
+            const arabic = document.getElementById('name-arabic').value;
+            if (!arabic) return showAlert('Nom arabe requis', 'error');
+            
+            data.names_of_allah.push({
+                name: arabic,
+                transliteration: document.getElementById('name-translit').value,
+                translation: document.getElementById('name-translation').value,
+                abjad: parseInt(document.getElementById('name-abjad').value)
+            });
+            saveData();
+            showAlert('Nom ajouté !');
+            loadList('names');
+        }
+
+        function addWord() {
+            const arabic = document.getElementById('word-arabic').value;
+            if (!arabic) return showAlert('Mot arabe requis', 'error');
+            
+            data.famous_words[arabic] = {
+                meaning: document.getElementById('word-meaning').value,
+                abjad: parseInt(document.getElementById('word-abjad').value)
+            };
+            saveData();
+            showAlert('Mot ajouté !');
+            loadList('words');
+        }
+
+        function addSurah() {
+            const number = document.getElementById('surah-number').value;
+            if (!number) return showAlert('Numéro requis', 'error');
+            
+            data.surahs[number] = {
+                name: document.getElementById('surah-name').value,
+                arabic: document.getElementById('surah-arabic').value,
+                verses: parseInt(document.getElementById('surah-verses').value),
+                theme: document.getElementById('surah-theme').value,
+                revelation: document.getElementById('surah-revelation').value
+            };
+            saveData();
+            showAlert('Sourate ajoutée !');
+            loadList('surahs');
+        }
+
+        // === SUPPRESSIONS ===
+        function deleteVerse(abjad) {
+            if (confirm('Supprimer cette entrée ?')) {
+                delete data.verses_by_abjad[abjad];
+                saveData();
+                loadList('verses');
+            }
+        }
+
+        function deleteName(index) {
+            if (confirm('Supprimer ce nom ?')) {
+                data.names_of_allah.splice(index, 1);
+                saveData();
+                loadList('names');
+            }
+        }
+
+        function deleteWord(word) {
+            if (confirm('Supprimer ce mot ?')) {
+                delete data.famous_words[word];
+                saveData();
+                loadList('words');
+            }
+        }
+
+        function deleteSurah(number) {
+            if (confirm('Supprimer cette sourate ?')) {
+                delete data.surahs[number];
+                saveData();
+                loadList('surahs');
+            }
+        }
+
+        // === AFFICHAGE DES LISTES ===
+        function loadList(type) {
+            if (type === 'verses') {
+                const list = document.getElementById('verses-list');
+                list.innerHTML = Object.entries(data.verses_by_abjad).map(([abjad, v]) => `
+                    <div class="list-item">
+                        <h3>Valeur ${abjad} - ${v.verse}</h3>
+                        <p dir="rtl" style="font-size: 18px; margin: 5px 0;">${v.arabic}</p>
+                        <p>${v.translation}</p>
+                        <div class="actions">
+                            <button class="btn btn-danger" onclick="deleteVerse('${abjad}')">🗑️ Supprimer</button>
+                        </div>
+                    </div>
+                `).join('') || '<p>Aucune correspondance</p>';
+            }
+            
+            if (type === 'names') {
+                const list = document.getElementById('names-list');
+                list.innerHTML = data.names_of_allah.map((n, i) => `
+                    <div class="list-item">
+                        <h3>${n.name} (${n.transliteration})</h3>
+                        <p>${n.translation} - Abjad: ${n.abjad}</p>
+                        <div class="actions">
+                            <button class="btn btn-danger" onclick="deleteName(${i})">🗑️ Supprimer</button>
+                        </div>
+                    </div>
+                `).join('') || '<p>Aucun nom</p>';
+            }
+            
+            if (type === 'words') {
+                const list = document.getElementById('words-list');
+                list.innerHTML = Object.entries(data.famous_words).map(([word, info]) => `
+                    <div class="list-item">
+                        <h3 dir="rtl">${word}</h3>
+                        <p>${info.meaning} - Abjad: ${info.abjad}</p>
+                        <div class="actions">
+                            <button class="btn btn-danger" onclick="deleteWord('${word}')">🗑️ Supprimer</button>
+                        </div>
+                    </div>
+                `).join('') || '<p>Aucun mot</p>';
+            }
+            
+            if (type === 'surahs') {
+                const list = document.getElementById('surahs-list');
+                list.innerHTML = Object.entries(data.surahs).map(([num, s]) => `
+                    <div class="list-item">
+                        <h3>${num}. ${s.name} (${s.arabic})</h3>
+                        <p>${s.verses} versets - ${s.theme} - ${s.revelation}</p>
+                        <div class="actions">
+                            <button class="btn btn-danger" onclick="deleteSurah('${num}')">🗑️ Supprimer</button>
+                        </div>
+                    </div>
+                `).join('') || '<p>Aucune sourate</p>';
+            }
+        }
+
+        // === EXPORT / IMPORT ===
+        function exportData() {
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sophia-data-${Date.now()}.json`;
+            a.click();
+            showAlert('Données exportées !');
+        }
+
+        function importData() {
+            const file = document.getElementById('import-file').files[0];
+            if (!file) return showAlert('Sélectionnez un fichier', 'error');
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    data = JSON.parse(e.target.result);
+                    saveData();
+                    showAlert('Données importées !');
+                    updateStats();
+                } catch (err) {
+                    showAlert('Fichier invalide', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ Effacer TOUTES les données ? Cette action est irréversible.')) {
+                localStorage.removeItem('sophia_data');
+                data = {verses_by_abjad: {}, names_of_allah: [], famous_words: {}, surahs: {}};
+                updateStats();
+                showAlert('Données effacées');
+            }
+        }
+
+        function generateCode() {
+            const code = `const ABJAD_DATABASE = ${JSON.stringify(data, null, 4)};
+
+function calculateAbjad(arabicWord) {
+    const abjad_values = ${JSON.stringify({
+        "ا": 1, "ب": 2, "ج": 3, "د": 4, "ه": 5, "و": 6, "ز": 7, "ح": 8, "ط": 9,
+        "ي": 10, "ك": 20, "ل": 30, "م": 40, "ن": 50, "س": 60, "ع": 70, "ف": 80, "ص": 90,
+        "ق": 100, "ر": 200, "ش": 300, "ت": 400, "ث": 500, "خ": 600, "ذ": 700, "ض": 800, "ظ": 900, "غ": 1000
+    })};
+    let total = 0;
+    for (let char of arabicWord) {
+        if (abjad_values[char]) total += abjad_values[char];
+    }
+    return total;
+}
+
+function findByAbjadValue(value) {
+    const results = [];
+    if (ABJAD_DATABASE.verses_by_abjad[value]) {
+        results.push({type: "verset", data: ABJAD_DATABASE.verses_by_abjad[value]});
+    }
+    ABJAD_DATABASE.names_of_allah.forEach(name => {
+        if (name.abjad === value) results.push({type: "nom_allah", data: name});
+    });
+    Object.entries(ABJAD_DATABASE.famous_words).forEach(([word, info]) => {
+        if (info.abjad === value) results.push({type: "mot_celèbre", data: {...info, word}});
+    });
+    return results;
+}`;
+            document.getElementById('generated-code').value = code;
+        }
+
+        function copyCode() {
+            const code = document.getElementById('generated-code');
+            code.select();
+            document.execCommand('copy');
+            showAlert('Code copié !');
+        }
+
+        // Initialisation
+        updateStats();
+        loadList('verses');
+    </script>
+</body>
+</html>
