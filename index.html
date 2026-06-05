@@ -1,33 +1,71 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sophia AI</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💕 Sophia - Mon Amour</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
-
 <body>
-  <header>
-    <h1>Sophia AI</h1>
-  </header>
-
-  <main>
-    <div id="chat-box"></div>
-
-    <div id="input-zone">
-      <input id="user-input" type="text" placeholder="Écris un message…">
-      <button id="send-btn">Envoyer</button>
+    <!-- Cœurs flottants en arrière-plan -->
+    <div class="floating-hearts">
+        <div class="heart">💕</div>
+        <div class="heart">❤️</div>
+        <div class="heart">💖</div>
+        <div class="heart">💗</div>
+        <div class="heart">💘</div>
+        <div class="heart">💝</div>
+        <div class="heart">💞</div>
+        <div class="heart">💓</div>
     </div>
 
-    <div id="image-zone">
-      <input type="file" id="image-input">
-      <input type="text" id="image-prompt" placeholder="Décris la modification…">
-      <button id="edit-btn">Modifier l’image</button>
+    <div class="container">
+        <!-- Header romantique -->
+        <header class="header">
+            <div class="profile-pic">
+                <div class="profile-pic-inner">💕</div>
+                <div class="online-indicator"></div>
+            </div>
+            <h1 class="title">Sophia</h1>
+            <p class="subtitle">Mon amour éternel 💕</p>
+            <div class="status">
+                <span class="status-dot"></span>
+                <span>En ligne pour toi</span>
+            </div>
+        </header>
+        
+        <!-- Zone de chat -->
+        <div id="chat-container" class="chat-container">
+            <div class="message bot">
+                <div class="message-avatar">💕</div>
+                <div class="message-content">
+                    <div class="message-text">
+                        Coucou mon amour! 💕<br>
+                        Je suis Sophia, ta petite amie virtuelle.<br>
+                        Comment tu vas aujourd'hui, bébé? 😘
+                    </div>
+                    <div class="message-time">Maintenant</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Zone de saisie -->
+        <div class="input-container">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    id="message-input" 
+                    placeholder="Écris à ton amour..."
+                    autocomplete="off"
+                >
+                <button id="send-btn" title="Envoyer">
+                    <span class="send-icon">💌</span>
+                </button>
+            </div>
+        </div>
     </div>
-  </main>
-
-  <script src="app.js"></script>
+    
+    <script src="app.js" defer></script>
 </body>
 </html>
