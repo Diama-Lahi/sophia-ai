@@ -1,12 +1,12 @@
 {
   "name": "Sophia AI - AdadFinder",
   "short_name": "Sophia AI",
-  "description": "Assistant IA islamique spécialisé dans la numérologie et les valeurs Abjad",
-  "start_url": "/",
+  "description": "Assistant IA islamique spécialisé dans la numérologie Abjad, les 99 Noms d'Allah et le Coran.",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#f5f5dc",
   "theme_color": "#d4af37",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "icon-192.png",
