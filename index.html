@@ -7,7 +7,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            font-family: 'Segoe UI', sans-serif; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background: linear-gradient(135deg, #f5f5dc 0%, #e8e8c8 100%); 
             color: #2c3e50; 
             min-height: 100vh; 
@@ -16,6 +16,7 @@
         .container { max-width: 900px; margin: 0 auto; }
         .header { text-align: center; margin-bottom: 30px; }
         .header h1 { color: #d4af37; font-size: 2.5rem; margin-bottom: 10px; }
+        .header p { color: #666; font-size: 0.95rem; }
         
         .chat-container { 
             background: white; 
@@ -27,32 +28,36 @@
         
         .messages { 
             min-height: 400px; 
-            max-height: 500px; 
+            max-height: 550px; 
             overflow-y: auto; 
             margin-bottom: 20px; 
             padding: 15px; 
             background: #fafafa; 
             border-radius: 15px; 
+            border: 2px solid #e0e0e0; 
         }
         
         .message { 
-            padding: 12px 18px; 
+            padding: 12px 16px; 
             margin: 10px 0; 
             border-radius: 12px; 
             white-space: pre-wrap; 
             line-height: 1.6; 
             position: relative;
+            animation: fadeIn 0.3s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         
         .user-message { 
             background: linear-gradient(135deg, #d4af37, #b5952f); 
             color: white; 
             margin-left: 20%; 
             text-align: right; 
+            box-shadow: 0 2px 8px rgba(212,175,55,0.2);
         }
         
         .ai-message { 
-            background: #f0f0f0; 
+            background: #f8f9fa; 
             margin-right: 20%; 
             border-left: 4px solid #d4af37; 
         }
@@ -60,109 +65,96 @@
         .input-container { display: flex; gap: 12px; }
         input[type="text"] { 
             flex: 1; 
-            padding: 14px 20px; 
+            padding: 14px 18px; 
             border: 2px solid #e0e0e0; 
             border-radius: 25px; 
             font-size: 16px; 
+            outline: none; 
+            transition: border-color 0.2s;
         }
+        input[type="text"]:focus { border-color: #d4af37; }
         
         .send-btn { 
             background: linear-gradient(135deg, #2d5016, #1e360e); 
             color: white; 
             border: none; 
-            padding: 14px 30px; 
+            padding: 14px 28px; 
             border-radius: 25px; 
             cursor: pointer; 
             font-weight: 600; 
+            font-size: 16px;
+            transition: transform 0.2s;
         }
+        .send-btn:hover { transform: translateY(-2px); }
+        .send-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         
         .action-buttons { 
             display: flex; 
-            gap: 10px; 
-            margin-top: 10px; 
+            gap: 8px; 
+            margin-top: 12px; 
             flex-wrap: wrap; 
         }
         
         .action-btn { 
-            padding: 8px 16px; 
-            border: 2px solid #d4af37; 
+            padding: 7px 14px; 
+            border: 1.5px solid #d4af37; 
             background: white; 
             color: #2c3e50; 
-            border-radius: 20px; 
+            border-radius: 18px; 
             cursor: pointer; 
-            font-size: 0.85rem; 
-            transition: all 0.3s; 
+            font-size: 0.82rem; 
+            font-weight: 500;
+            transition: all 0.2s; 
         }
-        
-        .action-btn:hover { 
-            background: #d4af37; 
-            color: white; 
-        }
+        .action-btn:hover { background: #d4af37; color: white; transform: scale(1.05); }
         
         .calligraphy-img { 
             max-width: 100%; 
             border-radius: 10px; 
             margin-top: 10px; 
             border: 3px solid #d4af37; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
         .quiz-container { 
-            background: #fff3cd; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin-top: 10px; 
+            background: #fff8e1; 
+            padding: 18px; 
+            border-radius: 12px; 
+            margin-top: 12px; 
+            border: 1px dashed #d4af37;
         }
         
         .quiz-option { 
             display: block; 
             width: 100%; 
             padding: 12px; 
-            margin: 8px 0; 
-            border: 2px solid #d4af37; 
+            margin: 6px 0; 
+            border: 1.5px solid #d4af37; 
             background: white; 
             border-radius: 8px; 
             cursor: pointer; 
             text-align: left; 
-            font-size: 1rem;
+            font-size: 0.95rem;
+            transition: all 0.2s;
         }
+        .quiz-option:hover:not(:disabled) { background: #d4af37; color: white; }
+        .quiz-option.correct { background: #27ae60 !important; color: white !important; border-color: #27ae60; }
+        .quiz-option.wrong { background: #e74c3c !important; color: white !important; border-color: #e74c3c; }
         
-        .quiz-option:hover { 
-            background: #d4af37; 
-            color: white; 
-        }
-        
-        .quiz-option.correct { 
-            background: #27ae60 !important; 
-            color: white !important; 
-            border-color: #27ae60; 
-        }
-        
-        .quiz-option.wrong { 
-            background: #e74c3c !important; 
-            color: white !important; 
-            border-color: #e74c3c; 
-        }
-        
-        .suggestions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        
+        .suggestions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
         .suggestion-btn {
-            background: white;
-            border: 2px solid #d4af37;
-            color: #2c3e50;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85rem;
+            background: white; border: 1.5px solid #d4af37; color: #2c3e50;
+            padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+            transition: all 0.2s;
         }
+        .suggestion-btn:hover { background: #d4af37; color: white; transform: translateY(-2px); }
+
+        .loading { color: #888; font-style: italic; padding: 10px 0; }
         
-        .suggestion-btn:hover {
-            background: #d4af37;
-            color: white;
+        @media (max-width: 768px) {
+            .user-message, .ai-message { margin-left: 5%; margin-right: 5%; }
+            .input-container { flex-direction: column; }
+            .send-btn { width: 100%; }
         }
     </style>
 </head>
@@ -170,41 +162,39 @@
     <div class="container">
         <div class="header">
             <h1>🌙 Sophia AI</h1>
-            <p>Assistant IA avec Audio, Calligraphie, Analyse et Quiz</p>
+            <p>Assistant IA officiel d'AdadFinder • Calcul Abjad • Coran • 99 Noms</p>
         </div>
 
         <div class="chat-container">
             <div class="suggestions">
-                <button class="suggestion-btn" onclick="useSuggestion('Calcule la valeur de محمد')">Valeur de محمد</button>
-                <button class="suggestion-btn" onclick="useSuggestion('Quel verset a la valeur 2713 ?')">Verset 2713</button>
-                <button class="suggestion-btn" onclick="useSuggestion('Donne-moi les 99 noms d\'Allah')">99 noms</button>
-                <button class="suggestion-btn" onclick="startQuiz()">🧠 Quiz</button>
+                <button class="suggestion-btn" onclick="useSuggestion('786')">🔍 Valeur 786</button>
+                <button class="suggestion-btn" onclick="useSuggestion('Calcule la valeur de محمد')">📊 Valeur de محمد</button>
+                <button class="suggestion-btn" onclick="useSuggestion('Donne-moi les 99 noms d\'Allah')">⭐ 99 Noms d'Allah</button>
+                <button class="suggestion-btn" onclick="startQuiz()">🧠 Lancer un Quiz</button>
             </div>
             
             <div class="messages" id="messages">
                 <div class="message ai-message">
-                    🌙 As-salamu alaykum ! Je suis Sophia AI.
+                    As-salamu alaykum ! 🌙 Je suis Sophia AI.
                     
-                    Fonctionnalités :
-                    🔊 Audio : Écoutez la prononciation
-                    🎨 Calligraphie : Générez des images stylisées
-                    📊 Analyse : Décomposition lettre par lettre
-                    🧠 Quiz : Testez vos connaissances
+                    ✅ Tape un nombre (ex: 786) → Je trouve les Noms, Mots & Sourates correspondants.
+                    ✅ Tape "Calcule X" → Je te donne la valeur Abjad exacte.
+                    ✅ Utilise les boutons sous mes réponses pour l'Audio 🔊, la Calligraphie 🎨 ou l'Analyse 📊.
                     
-                    Posez votre question !
+                    Comment puis-je t'aider aujourd'hui ?
                 </div>
             </div>
             
             <div class="input-container">
-                <input type="text" id="userInput" placeholder="Posez votre question..." onkeypress="if(event.key==='Enter')sendMessage()">
-                <button class="send-btn" onclick="sendMessage()">Envoyer</button>
+                <input type="text" id="userInput" placeholder="Pose ta question ou tape un nombre..." onkeypress="if(event.key==='Enter')sendMessage()">
+                <button class="send-btn" onclick="sendMessage()" id="sendBtn">Envoyer</button>
             </div>
         </div>
     </div>
 
     <script>
         const API_URL = 'http://localhost:8000';
-        const SESSION_ID = 'session_' + Date.now();
+        const SESSION_ID = 'sophia_' + Math.random().toString(36).substr(2, 9);
 
         function addMessage(text, type) {
             const messagesDiv = document.getElementById('messages');
@@ -220,165 +210,180 @@
             const buttonsDiv = document.createElement('div');
             buttonsDiv.className = 'action-buttons';
             
-            // Bouton Audio
-            const audioBtn = document.createElement('button');
-            audioBtn.className = 'action-btn';
-            audioBtn.textContent = '🔊 Écouter';
-            audioBtn.onclick = () => playAudio(text);
-            buttonsDiv.appendChild(audioBtn);
-            
-            // Bouton Calligraphie
-            const calliBtn = document.createElement('button');
-            calliBtn.className = 'action-btn';
-            calliBtn.textContent = '🎨 Calligraphie';
-            calliBtn.onclick = () => generateCalligraphy(text, msgDiv);
-            buttonsDiv.appendChild(calliBtn);
-            
-            // Bouton Analyse
-            const analyzeBtn = document.createElement('button');
-            analyzeBtn.className = 'action-btn';
-            analyzeBtn.textContent = '📊 Analyser';
-            analyzeBtn.onclick = () => analyzeText(text, msgDiv);
-            buttonsDiv.appendChild(analyzeBtn);
+            const actions = [
+                { icon: '🔊', label: 'Écouter', action: () => playAudio(text) },
+                { icon: '🎨', label: 'Calligraphie', action: () => generateCalligraphy(text, msgDiv) },
+                { icon: '📊', label: 'Analyser', action: () => analyzeText(text, msgDiv) }
+            ];
+
+            actions.forEach(act => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn';
+                btn.textContent = `${act.icon} ${act.label}`;
+                btn.onclick = act.action;
+                buttonsDiv.appendChild(btn);
+            });
             
             msgDiv.appendChild(buttonsDiv);
         }
 
         async function playAudio(text) {
             try {
+                // Le backend filtre automatiquement le texte pour ne garder que l'arabe
                 const audio = new Audio(`${API_URL}/audio/play/${encodeURIComponent(text)}`);
                 audio.play();
             } catch (error) {
-                addMessage('❌ Erreur audio: ' + error.message, 'ai');
+                addMessage('❌ Impossible de jouer l\'audio.', 'ai');
             }
         }
 
         async function generateCalligraphy(text, msgDiv) {
             try {
-                const response = await fetch(`${API_URL}/calligraphy/${encodeURIComponent(text)}`);
-                const data = await response.json();
-                
+                const res = await fetch(`${API_URL}/calligraphy/${encodeURIComponent(text)}`);
+                const data = await res.json();
                 if (data.image) {
                     const img = document.createElement('img');
                     img.className = 'calligraphy-img';
                     img.src = `data:image/png;base64,${data.image}`;
                     msgDiv.appendChild(img);
                     
-                    const downloadBtn = document.createElement('a');
-                    downloadBtn.href = `${API_URL}/calligraphy/download/${encodeURIComponent(text)}`;
-                    downloadBtn.download = `calligraphy_${text}.png`;
-                    downloadBtn.className = 'action-btn';
-                    downloadBtn.textContent = '💾 Télécharger';
-                    downloadBtn.style.marginTop = '10px';
-                    downloadBtn.style.display = 'inline-block';
-                    msgDiv.appendChild(downloadBtn);
+                    const dl = document.createElement('a');
+                    dl.href = `${API_URL}/calligraphy/download/${encodeURIComponent(text)}`;
+                    dl.download = `calligraphy_${text.replace(/\s/g, '_')}.png`;
+                    dl.className = 'action-btn';
+                    dl.textContent = '💾 Télécharger';
+                    dl.style.marginTop = '8px';
+                    dl.style.display = 'inline-block';
+                    msgDiv.appendChild(dl);
                 }
-            } catch (error) {
-                addMessage('❌ Erreur calligraphie: ' + error.message, 'ai');
-            }
+            } catch (e) { addMessage('❌ Erreur calligraphie.', 'ai'); }
         }
 
         async function analyzeText(text, msgDiv) {
             try {
-                const response = await fetch(`${API_URL}/analyze/${encodeURIComponent(text)}`);
-                const data = await response.json();
-                
-                let result = `📊 Analyse de "${text}" :\n\n`;
-                result += `Oriental: ${data.oriental.total} (${data.oriental.letters} lettres)\n`;
-                result += `Maghrébin: ${data.maghribi.total} (${data.maghribi.letters} lettres)\n\n`;
-                
-                result += `Décomposition :\n`;
-                data.breakdown.forEach(item => {
-                    result += `${item.letter} = ${item.oriental_value} (Oriental) / ${item.maghribi_value} (Maghrébin)\n`;
+                const res = await fetch(`${API_URL}/analyze/${encodeURIComponent(text)}`);
+                const data = await res.json();
+                let out = `📊 Analyse de "${text}" :\n\n`;
+                out += `🔵 Oriental : ${data.oriental.total} (${data.oriental.letters} lettres)\n`;
+                out += `🟢 Maghrébin : ${data.maghribi.total} (${data.maghribi.letters} lettres)\n\n`;
+                out += `Décomposition :\n`;
+                data.breakdown.forEach(b => {
+                    out += `${b.letter} = ${b.oriental_value} (Ori) / ${b.maghribi_value} (Mag)\n`;
                 });
-                
-                addMessage(result, 'ai');
-            } catch (error) {
-                addMessage('❌ Erreur analyse: ' + error.message, 'ai');
-            }
+                addMessage(out, 'ai');
+            } catch (e) { addMessage('❌ Erreur analyse.', 'ai'); }
         }
 
         async function startQuiz() {
             try {
-                const response = await fetch(`${API_URL}/quiz`);
-                const data = await response.json();
+                const res = await fetch(`${API_URL}/quiz`);
+                const data = await res.json();
                 
                 const quizDiv = document.createElement('div');
                 quizDiv.className = 'message ai-message';
                 quizDiv.innerHTML = `
                     <div class="quiz-container">
-                        <h3>🧠 Quiz</h3>
+                        <h3>🧠 Quiz Abjad</h3>
                         <p><strong>${data.question}</strong></p>
-                        <div id="quiz-options"></div>
+                        <div id="quiz-options-${Date.now()}"></div>
                     </div>
                 `;
-                
                 document.getElementById('messages').appendChild(quizDiv);
                 
-                const optionsDiv = quizDiv.querySelector('#quiz-options');
-                data.options.forEach(option => {
+                const optionsDiv = quizDiv.querySelector('[id^="quiz-options"]');
+                data.options.forEach(opt => {
                     const btn = document.createElement('button');
                     btn.className = 'quiz-option';
-                    btn.textContent = option;
+                    btn.textContent = opt;
                     btn.onclick = async () => {
-                        const checkResponse = await fetch(`${API_URL}/quiz/check`, {
+                        btn.disabled = true;
+                        optionsDiv.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
+                        
+                        const checkRes = await fetch(`${API_URL}/quiz/check`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                answer: option,
-                                correct_answer: data.correct_answer
-                            })
+                            body: JSON.stringify({ answer: opt, correct_answer: data.correct_answer })
                         });
-                        const result = await checkResponse.json();
+                        const checkData = await checkRes.json();
                         
-                        // Désactiver tous les boutons
-                        optionsDiv.querySelectorAll('.quiz-option').forEach(b => {
-                            b.disabled = true;
-                            if (b.textContent == data.correct_answer) {
-                                b.classList.add('correct');
-                            }
-                        });
+                        if (opt == data.correct_answer) btn.classList.add('correct');
+                        else btn.classList.add('wrong');
                         
-                        if (!result.correct) {
-                            btn.classList.add('wrong');
-                        }
-                        
-                        addMessage(result.message, 'ai');
+                        addMessage(checkData.message, 'ai');
                     };
                     optionsDiv.appendChild(btn);
                 });
-                
                 document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
-            } catch (error) {
-                addMessage('❌ Erreur quiz: ' + error.message, 'ai');
-            }
+            } catch (e) { addMessage('❌ Erreur quiz.', 'ai'); }
         }
 
         async function sendMessage() {
             const input = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
             const text = input.value.trim();
             if (!text) return;
 
             const msgDiv = addMessage(text, 'user');
             addActionButtons(text, msgDiv);
             input.value = '';
+            sendBtn.disabled = true;
+
+            const loadingDiv = addMessage('⏳ Recherche en cours...', 'ai');
+            loadingDiv.style.color = '#888';
 
             try {
-                const response = await fetch(`${API_URL}/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: text,
-                        session_id: SESSION_ID
-                    })
-                });
-
-                const data = await response.json();
-                if (data.reply) {
-                    addMessage(data.reply, 'ai');
+                let response, data;
+                
+                // Détection : Si c'est un nombre pur, on utilise la route optimisée
+                if (/^\d+$/.test(text)) {
+                    response = await fetch(`${API_URL}/search/number/${text}`);
+                    data = await response.json();
+                    
+                    if (data.total_found > 0) {
+                        let reply = `🔍 **Résultats pour ${data.value}** :\n\n`;
+                        
+                        if (data.names_of_allah.length > 0) {
+                            reply += `⭐ **Noms d'Allah :**\n`;
+                            data.names_of_allah.forEach(n => reply += `  • ${n.arabic} (${n.trans}) = ${n.value}\n`);
+                            reply += `\n`;
+                        }
+                        if (data.famous_words.length > 0) {
+                            reply += `🌟 **Mots célèbres :**\n`;
+                            data.famous_words.forEach(w => reply += `  • ${w.arabic} (${w.trans}) = ${w.value}\n`);
+                            reply += `\n`;
+                        }
+                        if (data.surahs.length > 0) {
+                            reply += `📖 **Sourates :**\n`;
+                            data.surahs.forEach(s => {
+                                let type = s.match_type === 'number' ? '(numéro)' : (s.match_type === 'name_oriental' ? '(valeur nom oriental)' : '(valeur nom maghrébin)');
+                                reply += `  • Sourate ${s.number}: ${s.name} ${type}\n`;
+                            });
+                            reply += `\n`;
+                        }
+                        if (data.verses.oriental.length > 0 || data.verses.maghribi.length > 0) {
+                            reply += `🕌 **Versets trouvés :**\n`;
+                            if (data.verses.oriental.length > 0) reply += `  🔵 Oriental : ${data.verses.oriental.length}\n`;
+                            if (data.verses.maghribi.length > 0) reply += `  🟢 Maghrébin : ${data.verses.maghribi.length}\n`;
+                        }
+                        reply += `\n📊 Total : ${data.total_found} correspondance(s)`;
+                        loadingDiv.replaceWith(addMessage(reply, 'ai'));
+                    } else {
+                        loadingDiv.replaceWith(addMessage(`❌ Aucune correspondance trouvée pour **${text}** dans les bases de données.`, 'ai'));
+                    }
+                } else {
+                    // Sinon, on utilise le chat IA
+                    response = await fetch(`${API_URL}/chat`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: text, session_id: SESSION_ID })
+                    });
+                    data = await response.json();
+                    loadingDiv.replaceWith(addMessage(data.reply || data.error || 'Erreur de réponse.', 'ai'));
                 }
             } catch (error) {
-                addMessage('❌ Erreur: ' + error.message, 'ai');
+                loadingDiv.replaceWith(addMessage(`❌ Erreur de connexion : ${error.message}`, 'ai'));
+            } finally {
+                sendBtn.disabled = false;
             }
         }
 
